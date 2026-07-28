@@ -1,0 +1,633 @@
+/* =============================================================================
+   CMY IMPRIMERIE DESIGN — proposition 2 : « Deux vies »
+   Une enseigne existe deux fois : le jour par son relief, la nuit par sa
+   lumière. Le site fait pareil — un interrupteur bascule toute la page.
+   Type condensée de signalétique, aplats sombres, halos de LED.
+   Aucune ombre portée d'élévation : les seules lueurs sont des sources
+   lumineuses représentées, et elles s'éteignent en mode jour.
+   ============================================================================= */
+
+/* ─────────────────────────────────────────────────────── 1. NUIT (défaut) */
+:root{
+  --fond:#06080d;
+  --fond-2:#0b0f16;
+  --surface:#10151e;
+  --txt:#f2f5f9;
+  --txt-2:#8d96a5;
+  --filet:rgba(255,255,255,.10);
+  --filet-fort:rgba(255,255,255,.22);
+
+  /* températures de LED — celles du catalogue du dépôt */
+  --led-chaud:#ffb020;
+  --led-froid:#9fd8ff;
+  --led-rouge:#ff5247;
+  --led-vert:#35d989;
+  --led-bleu:#4fa3ff;
+  --led:var(--led-chaud);
+
+  --lueur:1;                 /* intensité des halos : 1 la nuit, 0 le jour */
+  --eteint:#1b212c;          /* face d'enseigne non alimentée */
+
+  --disp:"Big Shoulders Display","Archivo Narrow",Impact,sans-serif;
+  --corps:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,monospace;
+
+  --cadre:1240px;
+  --marge:40px;
+}
+
+/* ───────────────────────────────────────────────────────────── 2. JOUR */
+:root[data-mode="jour"]{
+  --fond:#e6e7ea;            /* béton, alucobond brossé */
+  --fond-2:#eff0f2;
+  --surface:#fafafb;
+  --txt:#101319;
+  --txt-2:#5c6672;
+  --filet:rgba(0,0,0,.13);
+  --filet-fort:rgba(0,0,0,.30);
+
+  /* mêmes teintes, densité montée pour rester lisibles sur clair */
+  --led-chaud:#8d5900;
+  --led-froid:#1a6ba3;
+  --led-rouge:#c2271e;
+  --led-vert:#0f7247;
+  --led-bleu:#1a5ec0;
+
+  --lueur:0;
+  --eteint:#d7d9dd;
+}
+
+/* ───────────────────────────────────────────────────────────── 3. BASE */
+*{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%;}
+
+body{
+  margin:0;background:var(--fond);color:var(--txt);
+  font-family:var(--corps);font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+  transition:background-color .6s ease,color .6s ease;
+}
+
+img,svg{display:block;max-width:100%;}
+a{color:inherit;}
+button{font:inherit;color:inherit;}
+p{margin:0;}
+
+:focus-visible{outline:2px solid var(--led-chaud);outline-offset:3px;}
+::selection{background:var(--led-chaud);color:#06080d;}
+
+.skip{position:absolute;left:-9999px;top:0;z-index:400;background:var(--led-chaud);color:#06080d;
+  padding:14px 22px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;}
+.skip:focus{left:0;}
+
+.cadre{max-width:var(--cadre);margin:0 auto;padding:0 var(--marge);position:relative;}
+
+/* ────────────────────────────────────────────── 4. TYPOGRAPHIE */
+.titre-geant{
+  font-family:var(--disp);font-weight:800;
+  font-size:clamp(56px,10.5vw,168px);line-height:.88;letter-spacing:-.005em;
+  text-transform:uppercase;margin:0;
+}
+
+h2{
+  font-family:var(--disp);font-weight:800;
+  font-size:clamp(38px,5.6vw,86px);line-height:.9;letter-spacing:-.005em;
+  text-transform:uppercase;margin:0;
+}
+
+h3{
+  font-family:var(--corps);font-weight:600;
+  font-size:19px;line-height:1.25;letter-spacing:-.01em;margin:0;
+}
+
+.num,.ref,.etiq,.sur,.cote-t,.gps,.tri,.form-note,.cote-h,.stock-fmt{
+  font-family:var(--mono);
+}
+
+.num{font-size:12px;letter-spacing:.22em;color:var(--txt-2);margin:0 0 4px;}
+
+.sur{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-2);
+}
+.sur b{color:var(--filet-fort);font-weight:400;}
+
+.etiq{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-2);}
+.ref{font-size:11px;letter-spacing:.18em;color:var(--led);
+  transition:color .5s ease;}
+
+.lien{
+  color:var(--txt);text-decoration:none;
+  border-bottom:1px solid var(--led-chaud);padding-bottom:1px;
+  transition:color .25s ease,border-color .25s ease;
+}
+.lien:hover{color:var(--led-chaud);}
+
+/* ────────────────────────────────────── 5. LA LAMPE (curseur) */
+/* Une lueur qui suit le pointeur, comme une lampe promenée sur une façade
+   la nuit. Éteinte le jour, sur tactile et en mouvement réduit. */
+.lampe{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;
+  transition:opacity .8s ease;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,40%),
+    rgba(255,176,32,.09),rgba(255,176,32,.03) 45%,transparent 70%);
+}
+:root[data-mode="nuit"] .lampe.on{opacity:1;}
+
+/* ──────────────────────────────────────────── 6. BARRE + INTERRUPTEUR */
+.barre{
+  position:sticky;top:0;z-index:150;
+  background:color-mix(in srgb,var(--fond) 88%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--filet);
+  transition:background-color .6s ease,border-color .6s ease;
+}
+.barre-in{max-width:var(--cadre);margin:0 auto;padding:0 var(--marge);
+  height:72px;display:flex;align-items:center;gap:28px;}
+
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto;}
+.logo-tube{
+  width:26px;height:10px;border-radius:5px;flex:0 0 auto;
+  background:var(--led-chaud);
+  filter:drop-shadow(0 0 calc(10px * var(--lueur)) var(--led-chaud));
+  transition:filter .6s ease,background-color .6s ease;
+}
+.logo-txt{font-family:var(--disp);font-weight:800;font-size:26px;line-height:.8;
+  letter-spacing:.01em;text-transform:uppercase;display:flex;flex-direction:column;gap:3px;}
+.logo-txt em{font-family:var(--mono);font-style:normal;font-size:9px;letter-spacing:.2em;
+  color:var(--txt-2);text-transform:uppercase;font-weight:400;}
+
+.nav{display:flex;gap:26px;margin-left:auto;}
+.nav a{font-size:14px;text-decoration:none;color:var(--txt-2);padding:6px 0;
+  position:relative;transition:color .2s ease;}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--led-chaud);transform:scaleX(0);transform-origin:0 50%;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1);}
+.nav a:hover{color:var(--txt);}
+.nav a:hover::after,.nav a.ici::after{transform:none;}
+.nav a.ici{color:var(--txt);}
+
+/* l'interrupteur : le geste central du site */
+.switch{
+  display:flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;
+  padding:6px 0;flex:0 0 auto;
+}
+.switch-piste{
+  width:46px;height:24px;border-radius:12px;position:relative;flex:0 0 auto;
+  background:var(--surface);border:1px solid var(--filet-fort);
+  transition:background-color .5s ease,border-color .5s ease;
+}
+.switch-bille{
+  position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--led-chaud);
+  filter:drop-shadow(0 0 calc(9px * var(--lueur)) var(--led-chaud));
+  transition:transform .42s cubic-bezier(.2,.9,.3,1),background-color .5s ease,filter .5s ease;
+}
+:root[data-mode="jour"] .switch-bille{transform:translateX(22px);background:var(--txt-2);}
+.switch-etat{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--txt-2);width:36px;text-align:left;}
+
+.burger{display:none;width:40px;height:40px;background:none;border:none;cursor:pointer;
+  flex-direction:column;justify-content:center;gap:5px;padding:0;}
+.burger span{display:block;height:2px;width:22px;background:var(--txt);
+  transition:transform .25s ease,opacity .25s ease;}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ──────────────────────────────────────────────────────── 7. HERO */
+.hero{position:relative;padding:88px 0 0;overflow:hidden;}
+.hero-in{position:relative;z-index:2;}
+
+.hero-halo{
+  position:absolute;left:50%;top:-6%;width:min(1100px,120%);aspect-ratio:1;
+  transform:translateX(-50%);pointer-events:none;z-index:1;
+  background:radial-gradient(circle,rgba(255,176,32,.16),transparent 62%);
+  opacity:var(--lueur);transition:opacity .8s ease;
+}
+
+.titre-geant{margin:28px 0 40px;}
+
+/* le mot qui s'allume — cœur de la proposition */
+.neon{position:relative;display:inline-block;color:var(--eteint);
+  transition:color .6s ease;}
+.neon > span{position:relative;z-index:2;}
+.neon.allume{
+  color:var(--led-chaud);
+  text-shadow:
+    0 0 calc(14px * var(--lueur)) rgba(255,176,32,.85),
+    0 0 calc(46px * var(--lueur)) rgba(255,176,32,.45),
+    0 0 calc(96px * var(--lueur)) rgba(255,176,32,.22);
+}
+/* le tube derrière les lettres */
+.neon::after{
+  content:"";position:absolute;left:-.06em;right:-.06em;top:.16em;bottom:.16em;z-index:1;
+  background:radial-gradient(ellipse at center,rgba(255,176,32,.30),transparent 72%);
+  opacity:0;transition:opacity .5s ease;
+}
+.neon.allume::after{opacity:var(--lueur);}
+
+.hero-bas{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;
+  padding-bottom:56px;}
+.chapo{font-size:17px;line-height:1.6;color:var(--txt-2);max-width:54ch;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+
+/* la rangée de caissons qui s'allument un par un */
+.facade{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;
+  border-top:1px solid var(--filet);padding-top:24px;padding-bottom:64px;}
+.facade span{
+  height:56px;border-radius:2px;background:var(--eteint);
+  transition:background-color .5s ease,filter .5s ease;
+}
+.facade.on span{
+  background:var(--led-chaud);
+  filter:drop-shadow(0 0 calc(16px * var(--lueur)) rgba(255,176,32,.55));
+  animation:allumer .5s cubic-bezier(.2,.9,.3,1) backwards;
+  animation-delay:calc(var(--d) * 90ms);
+}
+.facade.on span:nth-child(3){background:var(--led-froid);
+  filter:drop-shadow(0 0 calc(16px * var(--lueur)) rgba(159,216,255,.5));}
+.facade.on span:nth-child(6){background:var(--led-rouge);
+  filter:drop-shadow(0 0 calc(16px * var(--lueur)) rgba(255,82,71,.5));}
+
+/* Le jour, un caisson ne montre que sa face laiteuse : il est éteint.
+   C'est tout l'argument de la page — on le tient jusqu'au bout. */
+:root[data-mode="jour"] .facade.on span,
+:root[data-mode="jour"] .facade.on span:nth-child(3),
+:root[data-mode="jour"] .facade.on span:nth-child(6){
+  background:#cfd2d7;filter:none;
+}
+
+@keyframes allumer{
+  0%{opacity:.15;} 40%{opacity:1;} 55%{opacity:.35;} 100%{opacity:1;}
+}
+
+/* ─────────────────────────────────────────────── 8. SECTIONS */
+.sec{padding:104px 0;position:relative;z-index:2;}
+.sec-fond{background:var(--fond-2);transition:background-color .6s ease;}
+
+/* le numéro coiffe le titre dans la colonne de gauche ; le texte d'accroche
+   occupe la colonne de droite et s'aligne sur la dernière ligne du titre */
+.entete{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  grid-template-areas:"num  txt" "titre txt";
+  column-gap:48px;padding-bottom:56px;
+  border-bottom:1px solid var(--filet);margin-bottom:56px;
+}
+.entete .num{grid-area:num;align-self:end;}
+.entete h2{grid-area:titre;}
+.entete-txt{grid-area:txt;align-self:end;color:var(--txt-2);font-size:16px;max-width:46ch;}
+
+.incise{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  font-size:14px;color:var(--txt-2);margin-top:56px;
+  padding-top:24px;border-top:1px solid var(--filet);
+}
+.incise-tube{
+  width:22px;height:6px;border-radius:3px;flex:0 0 auto;background:var(--led-chaud);
+  filter:drop-shadow(0 0 calc(8px * var(--lueur)) var(--led-chaud));
+  transition:filter .6s ease;
+}
+
+/* ─────────────────────────────────────────── 9. DEUX VIES */
+.vies{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+.vie-scene{position:relative;height:280px;border-radius:3px;overflow:hidden;margin-bottom:20px;}
+.vie-scene span{position:absolute;transition:background-color .6s ease,filter .6s ease;}
+
+.v-mur{inset:0;}
+.v-bandeau{left:8%;right:8%;top:22%;height:16%;}
+.v-l1{left:18%;top:52%;width:14%;height:22%;}
+.v-l2{left:38%;top:52%;width:14%;height:22%;}
+.v-l3{left:58%;top:52%;width:14%;height:22%;}
+.v-sol{left:0;right:0;bottom:14%;height:1px;}
+
+/* la même façade, deux heures */
+.v-jour .v-mur{background:#c9ccd2;}
+.v-jour .v-bandeau{background:#8f959f;}
+.v-jour .v-l1,.v-jour .v-l2,.v-jour .v-l3{background:#5d636d;}
+.v-jour .v-sol{background:rgba(0,0,0,.28);}
+
+/* Ces deux vignettes sont une démonstration côte à côte : elles gardent leurs
+   couleurs propres quel que soit le mode du site, sinon la comparaison
+   s'effondre dès qu'on bascule l'interrupteur. Valeurs figées, pas de jetons. */
+.v-nuit .v-mur{background:#0a0d13;}
+.v-nuit .v-bandeau{background:#151a23;}
+.v-nuit .v-l1,.v-nuit .v-l2,.v-nuit .v-l3{
+  background:#ffb020;
+  filter:drop-shadow(0 0 18px rgba(255,176,32,.6));
+}
+.v-nuit .v-sol{background:rgba(255,255,255,.14);}
+
+.vie .etiq{margin-bottom:8px;}
+.vie h3{margin-bottom:8px;}
+.vie p{color:var(--txt-2);font-size:15px;}
+
+/* ────────────────────────────────────────── 10. PIÈCES */
+.tris{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px;}
+.tri{
+  background:none;border:1px solid var(--filet);border-radius:999px;cursor:pointer;
+  padding:9px 16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt-2);display:flex;gap:8px;align-items:center;
+  transition:color .2s ease,border-color .2s ease,background-color .2s ease;
+}
+.tri i{font-style:normal;opacity:.5;}
+.tri:hover{color:var(--txt);border-color:var(--filet-fort);}
+.tri.actif{background:var(--led-chaud);border-color:var(--led-chaud);color:#06080d;}
+/* le jour l'ambre est assombri : c'est le blanc qui porte, plus l'encre */
+:root[data-mode="jour"] .tri.actif{color:#fff;}
+:root[data-mode="jour"] .cta-plein{color:#fff;}
+.tri.actif i{opacity:.65;}
+
+.pieces{display:grid;grid-template-columns:repeat(4,1fr);gap:32px 24px;}
+.piece{cursor:default;}
+.piece.masquee{display:none;}
+
+.scene{
+  position:relative;height:168px;border-radius:3px;background:var(--surface);
+  display:grid;place-items:center;margin-bottom:16px;overflow:hidden;
+  transition:background-color .5s ease;
+}
+.scene svg{width:78%;height:auto;}
+/* traits de construction, éteints */
+.scene .t{fill:none;stroke:var(--txt-2);stroke-width:2;stroke-linecap:round;opacity:.55;
+  transition:stroke .45s ease,opacity .45s ease;}
+/* la face d'enseigne : c'est elle qui s'allume */
+.scene .f{fill:var(--eteint);stroke:var(--txt-2);stroke-width:2;opacity:.9;
+  transition:fill .45s ease,stroke .45s ease,filter .45s ease;}
+.scene .h{fill:none;stroke:none;}
+
+.piece:hover .scene .f,.piece:focus-within .scene .f{
+  fill:var(--led);stroke:var(--led);
+  filter:drop-shadow(0 0 calc(12px * var(--lueur)) var(--led));
+}
+.piece:hover .scene .t{stroke:var(--txt);opacity:.85;}
+.piece:hover .scene .h{fill:var(--led);opacity:calc(.16 * var(--lueur));}
+
+.piece h3{margin:6px 0 8px;transition:color .3s ease;}
+.piece:hover h3{color:var(--led);}
+.desc{font-size:14px;color:var(--txt-2);line-height:1.5;}
+
+.vide{font-family:var(--mono);font-size:14px;color:var(--txt-2);padding:48px 0;}
+
+/* ────────────────────────────────────────── 11. LE DÉPÔT */
+.stock{list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--filet);border:1px solid var(--filet);border-radius:3px;overflow:hidden;}
+.stock li{background:var(--fond);padding:28px 26px;transition:background-color .35s ease;}
+.sec-fond .stock li{background:var(--fond-2);}
+.stock li:hover{background:var(--surface);}
+.stock h3{margin:8px 0 12px;font-size:21px;}
+.stock h3 em{display:block;font-family:var(--mono);font-style:normal;font-size:11px;
+  letter-spacing:.1em;color:var(--txt-2);margin-top:5px;font-weight:400;}
+.stock-fmt{font-size:12px;color:var(--txt);margin-bottom:8px;}
+.stock-use{font-size:14px;color:var(--txt-2);}
+
+/* ────────────────────────────────────────── 12. MÉTHODE */
+.etapes{list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:32px;counter-reset:e;}
+.etapes li{padding-top:24px;border-top:1px solid var(--filet);position:relative;}
+.etape-n{
+  display:block;font-family:var(--disp);font-weight:800;font-size:76px;line-height:.85;
+  color:var(--led-chaud);margin-bottom:16px;
+  text-shadow:0 0 calc(28px * var(--lueur)) rgba(255,176,32,.35);
+  transition:color .6s ease,text-shadow .6s ease;
+}
+.etapes h3{margin-bottom:8px;}
+.etapes p{font-size:14px;color:var(--txt-2);}
+
+/* ────────────────────────────────────────── 13. CHANTIERS */
+.chantiers{display:grid;grid-template-columns:repeat(6,1fr);gap:36px 24px;}
+.ch{grid-column:span 2;}
+.ch-large{grid-column:span 3;}
+
+.ch-scene{position:relative;height:240px;border-radius:3px;overflow:hidden;
+  background:var(--surface);margin-bottom:16px;transition:background-color .5s ease;}
+.ch-large .ch-scene{height:300px;}
+.ch-scene span{position:absolute;background:var(--eteint);border-radius:1px;
+  transition:background-color .45s ease,filter .45s ease,transform .45s cubic-bezier(.2,.9,.3,1);}
+
+/* devanture : bandeau, deux vitrines, porte */
+.c1 .m1{left:8%;top:20%;width:84%;height:17%;}
+.c1 .m2{left:8%;top:46%;width:30%;height:34%;}
+.c1 .m3{left:62%;top:46%;width:30%;height:34%;}
+.c1 .m4{left:44%;top:54%;width:12%;height:26%;}
+/* totem : caisson, bandeau, mât, massif */
+.c2 .m1{left:34%;top:14%;width:32%;height:26%;}
+.c2 .m2{left:34%;top:43%;width:32%;height:11%;}
+.c2 .m3{left:47%;top:54%;width:6%;height:28%;}
+.c2 .m4{left:30%;top:82%;width:40%;height:5%;}
+/* bâche : toile, deux lignes, lest */
+.c3 .m1{left:10%;top:24%;width:80%;height:44%;}
+.c3 .m2{left:20%;top:36%;width:60%;height:9%;}
+.c3 .m3{left:20%;top:51%;width:36%;height:7%;}
+.c3 .m4{left:10%;top:74%;width:80%;height:2%;}
+/* véhicule : caisse, cabine, deux roues */
+.c4 .m1{left:10%;top:38%;width:62%;height:28%;}
+.c4 .m2{left:68%;top:46%;width:22%;height:20%;}
+.c4 .m3{left:22%;top:66%;width:13%;height:14%;border-radius:50%;}
+.c4 .m4{left:64%;top:66%;width:13%;height:14%;border-radius:50%;}
+/* signalétique : plaque murale, plaque de porte, directionnel */
+.c5 .m1{left:12%;top:22%;width:32%;height:52%;}
+.c5 .m2{left:52%;top:22%;width:34%;height:18%;}
+.c5 .m3{left:52%;top:50%;width:24%;height:12%;}
+.c5 .m4{left:52%;top:70%;width:34%;height:4%;}
+
+/* au survol, la pièce s'allume — l'élément principal en premier */
+.ch:hover .m1{background:var(--led-chaud);
+  filter:drop-shadow(0 0 calc(16px * var(--lueur)) rgba(255,176,32,.5));}
+.ch:hover .m2{background:var(--led-froid);transition-delay:.06s;
+  filter:drop-shadow(0 0 calc(12px * var(--lueur)) rgba(159,216,255,.45));}
+.ch:hover .m3{background:var(--led-froid);transition-delay:.12s;}
+.ch:hover .m4{background:var(--filet-fort);transition-delay:.16s;}
+.ch:hover h3{color:var(--led-chaud);}
+
+.ch .etiq{margin-bottom:8px;}
+.ch h3{margin-bottom:8px;transition:color .3s ease;}
+.ch p{font-size:14px;color:var(--txt-2);}
+
+/* ────────────────────────────────────────── 14. DEVIS */
+.devis{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:56px;}
+.form{display:flex;flex-direction:column;gap:22px;}
+.champ{display:flex;flex-direction:column;gap:8px;}
+.champ-duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+
+label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--txt-2);}
+.fac{text-transform:none;letter-spacing:.02em;opacity:.7;}
+
+input,select,textarea{
+  font-family:var(--corps);font-size:15px;color:var(--txt);
+  background:var(--surface);border:1px solid var(--filet);border-radius:3px;
+  padding:13px 15px;width:100%;-webkit-appearance:none;appearance:none;
+  transition:border-color .2s ease,background-color .4s ease;
+}
+textarea{resize:vertical;min-height:118px;}
+select{background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+  linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px;
+  background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:44px;}
+input:hover,select:hover,textarea:hover{border-color:var(--filet-fort);}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--led-chaud);}
+input.faux,select.faux{border-color:var(--led-rouge);}
+::placeholder{color:var(--txt-2);opacity:.65;}
+
+.form-pied{display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  border-top:1px solid var(--filet);padding-top:22px;}
+.form-note{font-size:12px;color:var(--txt-2);}
+.form-note.faux{color:var(--led-rouge);}
+
+.cote{padding-top:24px;border-top:1px solid var(--filet-fort);}
+.cote-t{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--txt-2);
+  margin-bottom:16px;}
+.cote-l{list-style:none;margin:0 0 34px;padding:0;}
+.cote-l li{font-size:14px;color:var(--txt-2);line-height:1.55;
+  padding:0 0 14px 18px;position:relative;}
+.cote-l li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:3px;
+  border-radius:2px;background:var(--led-chaud);}
+.cote-l b{color:var(--txt);font-weight:600;}
+.cote-h{font-size:12px;color:var(--txt-2);}
+
+.tel{display:block;font-family:var(--disp);font-weight:700;font-size:34px;line-height:1;
+  text-decoration:none;margin-bottom:10px;transition:color .25s ease;}
+.tel:hover{color:var(--led-chaud);}
+
+/* ────────────────────────────────────────── 15. ATELIER */
+.infos{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+.bloc{padding-top:24px;border-top:1px solid var(--filet-fort);}
+address{font-style:normal;font-size:15px;line-height:1.6;margin-bottom:14px;}
+.gps{font-size:11px;letter-spacing:.1em;color:var(--txt-2);margin-top:14px;}
+
+.horaires{width:100%;border-collapse:collapse;}
+.horaires th,.horaires td{padding:5px 0;font-size:14px;text-align:left;font-weight:400;}
+.horaires th{color:var(--txt-2);}
+.horaires td{text-align:right;font-family:var(--mono);font-size:12px;}
+.horaires .off{color:var(--txt-2);opacity:.7;}
+.horaires tr.aujourdhui th,.horaires tr.aujourdhui td{color:var(--txt);font-weight:600;}
+.horaires tr.aujourdhui th::after{content:" · aujourd'hui";font-family:var(--mono);
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--led-chaud);font-weight:400;}
+
+.bloc-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px;align-items:stretch;}
+
+/* ────────────────────────────────────────── 16. BOUTONS */
+.cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  height:50px;padding:0 24px;border:1px solid transparent;border-radius:3px;
+  text-decoration:none;cursor:pointer;font-family:var(--mono);font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease,filter .35s ease;
+}
+.cta-plein{background:var(--led-chaud);color:#06080d;
+  filter:drop-shadow(0 0 calc(20px * var(--lueur)) rgba(255,176,32,.35));}
+.cta-plein:hover{filter:drop-shadow(0 0 calc(34px * var(--lueur)) rgba(255,176,32,.55));}
+.cta-creux{background:transparent;color:var(--txt);border-color:var(--filet-fort);}
+.cta-creux:hover{border-color:var(--led-chaud);color:var(--led-chaud);}
+.cta-wa{background:var(--surface);color:var(--txt);border-color:var(--filet-fort);}
+.cta-wa:hover{background:#0d8a3f;border-color:#0d8a3f;color:#fff;}
+
+.wa{
+  width:17px;height:17px;flex:0 0 auto;background:currentColor;
+  -webkit-mask:var(--wai) center/contain no-repeat;mask:var(--wai) center/contain no-repeat;
+  --wai:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2C8.8 2 3 7.8 3 15c0 2.4.7 4.7 1.9 6.7L3 30l8.5-1.9c1.9 1 4.1 1.6 6.5 1.6h.1C23.2 29.7 29 23.9 29 16.7 29 9.5 23.2 2 16 2zm0 25c-2 0-4-.5-5.7-1.6l-.4-.2-4.2.9.9-4.1-.3-.4A11.6 11.6 0 0 1 4.6 15C4.6 8.7 9.7 3.6 16 3.6S27.4 8.7 27.4 15 22.3 27 16 27zm6.4-8.3c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a9.2 9.2 0 0 1-4.5-4c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.2 1.2-1.2 3s1.3 3.4 1.4 3.6c.2.2 2.5 3.9 6.1 5.4 2.2 1 3.1 1.1 4.2.9.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z'/%3E%3C/svg%3E");
+}
+
+.wa-flottant{
+  position:fixed;right:24px;bottom:24px;z-index:190;
+  width:54px;height:54px;border-radius:50%;background:#0d8a3f;color:#fff;
+  display:flex;align-items:center;justify-content:center;text-decoration:none;
+  transition:transform .25s ease;
+}
+.wa-flottant .wa{width:25px;height:25px;}
+.wa-flottant:hover{transform:scale(1.07);}
+
+/* ────────────────────────────────────────── 17. PIED */
+.pied{border-top:1px solid var(--filet);padding:56px 0 40px;position:relative;z-index:2;}
+.pied-haut{display:grid;grid-template-columns:1fr auto auto;gap:48px;align-items:start;
+  padding-bottom:40px;}
+.pied-nav{display:flex;flex-direction:column;gap:9px;}
+.pied-nav a{font-size:14px;text-decoration:none;color:var(--txt-2);transition:color .2s ease;}
+.pied-nav a:hover{color:var(--txt);}
+.pied-contact{display:flex;flex-direction:column;gap:9px;align-items:flex-start;font-size:14px;}
+.pied-bas{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  border-top:1px solid var(--filet);padding-top:24px;
+  font-family:var(--mono);font-size:11px;color:var(--txt-2);letter-spacing:.04em;}
+
+/* ────────────────────────────────────────── 18. RÉVÉLATION */
+.reveal{opacity:0;transform:translateY(14px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.3,1);}
+.reveal.vu{opacity:1;transform:none;}
+
+/* ────────────────────────────────────────── 19. RESPONSIVE */
+@media (max-width:1100px){
+  .pieces{grid-template-columns:repeat(3,1fr);}
+  .stock{grid-template-columns:repeat(2,1fr);}
+  .etapes{grid-template-columns:repeat(2,1fr);gap:36px 32px;}
+  .chantiers{grid-template-columns:repeat(4,1fr);}
+  .ch,.ch-large{grid-column:span 2;}
+}
+
+@media (max-width:900px){
+  :root{--marge:28px;}
+  .nav{display:none;}
+  .burger{display:flex;}
+  .barre.ouvert .nav{
+    display:flex;flex-direction:column;gap:0;position:absolute;top:72px;left:0;right:0;
+    background:var(--fond);border-bottom:1px solid var(--filet);padding:8px var(--marge) 22px;
+  }
+  .barre.ouvert .nav a{padding:13px 0;font-size:16px;border-bottom:1px solid var(--filet);}
+  /* l'interrupteur reste à droite, juste avant le menu — jamais devant le logo */
+  .switch{margin-left:auto;}
+  .entete{grid-template-columns:1fr;gap:24px;align-items:start;}
+  .hero-bas{grid-template-columns:1fr;align-items:start;gap:28px;}
+  .vies{grid-template-columns:1fr;gap:32px;}
+  .devis{grid-template-columns:1fr;gap:40px;}
+  .infos{grid-template-columns:1fr;gap:32px;}
+  .pied-haut{grid-template-columns:1fr;gap:32px;}
+  .pied-nav{flex-direction:row;flex-wrap:wrap;gap:10px 22px;}
+}
+
+@media (max-width:680px){
+  :root{--marge:20px;}
+  .sec{padding:72px 0;}
+  .hero{padding-top:56px;}
+  .titre-geant{margin:20px 0 32px;}
+  .pieces{grid-template-columns:repeat(2,1fr);gap:28px 18px;}
+  .stock{grid-template-columns:1fr;}
+  .etapes{grid-template-columns:1fr;gap:28px;}
+  .chantiers{grid-template-columns:1fr;}
+  .ch,.ch-large{grid-column:span 1;}
+  .ch-large .ch-scene,.ch-scene{height:220px;}
+  .champ-duo{grid-template-columns:1fr;}
+  .facade{grid-template-columns:repeat(4,1fr);}
+  .facade span{height:44px;}
+  .scene{height:140px;}
+  .switch-etat{display:none;}
+  .wa-flottant{width:48px;height:48px;right:16px;bottom:16px;}
+  .pied-bas{flex-direction:column;gap:10px;}
+}
+
+@media (max-width:420px){
+  .pieces{grid-template-columns:1fr;}
+}
+
+/* ────────────────────────────────────────── 20. MOUVEMENT RÉDUIT */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .reveal{opacity:1;transform:none;}
+  .lampe{display:none;}
+}
+
+/* ────────────────────────────────────────── 21. IMPRESSION */
+@media print{
+  .barre,.wa-flottant,.lampe,.hero-halo,.facade,.tris{display:none !important;}
+  :root{--fond:#fff;--fond-2:#fff;--surface:#fff;--txt:#000;--txt-2:#444;
+        --filet:#ccc;--filet-fort:#888;--lueur:0;--eteint:#eee;}
+  body{background:#fff;color:#000;}
+  .sec{padding:24pt 0;}
+  .piece,.ch,.stock li{break-inside:avoid;}
+}

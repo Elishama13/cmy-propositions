@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>CMY Imprimerie Design</title>
+  <rect width="64" height="64" fill="#ffffff"/>
+  <g style="isolation:isolate">
+    <circle cx="24" cy="24" r="18" fill="#00aeef" style="mix-blend-mode:multiply"/>
+    <circle cx="40" cy="26" r="18" fill="#ec008c" style="mix-blend-mode:multiply"/>
+    <circle cx="32" cy="40" r="18" fill="#fff200" style="mix-blend-mode:multiply"/>
+  </g>
+</svg>

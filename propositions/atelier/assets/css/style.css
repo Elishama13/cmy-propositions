@@ -1,0 +1,406 @@
+/* ============================================================
+   CMY IMPRIMERIE DESIGN — direction « ATELIER »
+   ------------------------------------------------------------
+   La page est un plan d'exécution. Le vocabulaire du métier
+   donne la nomenclature du site : planches, nomenclature des
+   pièces, bordereau du dépôt, gamme de fabrication, cartouche.
+   Les cotes portent de vraies dimensions, les hachures marquent
+   les matières coupées, les repères numérotés renvoient à la
+   nomenclature — rien n'est décoratif.
+   Aucune ombre portée. Aucun encadré de couleur : le seul rouge
+   est celui des repères et des lignes de cote, comme sur un plan.
+   ============================================================ */
+
+/* ---------- 01. JETONS ---------- */
+:root{
+  --paper:#E9ECEE;          /* tirage de plan */
+  --paper-2:#F3F5F6;        /* fond de planche */
+  --paper-3:#DDE2E5;        /* aplat de repérage */
+  --ink:#161D22;            /* trait fort */
+  --ink-2:#4A575F;          /* trait moyen / texte secondaire */
+  --ink-3:#8E9AA1;          /* trait fin */
+  --line:#C3CBD0;           /* filet */
+  --minium:#C6482D;         /* encre des cotes et des repères */
+  --minium-2:#9E3620;
+  --dark:#161C21;           /* planche au trait inversé */
+  --dark-2:#1F272D;
+
+  --f-display:"Saira Condensed",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+
+  --gut:clamp(18px,2vw,30px);
+  --marge:34px;             /* marge de gauche : la règle graduée */
+  --t:180ms;
+  --ease:cubic-bezier(.2,.7,.3,1);
+}
+
+/* ---------- 02. SOCLE ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-body);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%;display:block}
+a{color:inherit}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:700;line-height:1;text-transform:uppercase;letter-spacing:.005em}
+.mono{font-family:var(--f-mono);font-size:.88em;letter-spacing:-.01em}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--minium);outline-offset:3px}
+
+.skip{position:fixed;top:-100px;left:10px;z-index:200;background:var(--minium);color:#fff;padding:12px 18px;font-weight:600;transition:top var(--t)}
+.skip:focus{top:10px}
+
+/* ---------- 03. RÈGLE GRADUÉE (marge du plan) ---------- */
+.rule{
+  position:fixed;left:0;top:0;bottom:0;width:var(--marge);z-index:80;
+  background:var(--paper-3);
+  background-image:
+    repeating-linear-gradient(180deg,var(--ink-3) 0 1px,transparent 1px 20px),
+    repeating-linear-gradient(180deg,var(--ink-2) 0 1px,transparent 1px 100px);
+  background-size:9px 20px,17px 100px;
+  background-position:left top,left top;
+  background-repeat:repeat-y;
+  border-right:1px solid var(--line);
+  pointer-events:none;
+}
+
+/* ---------- 04. BANDEAU ---------- */
+.bar{position:sticky;top:0;z-index:90;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar-in{
+  display:flex;align-items:center;gap:18px;
+  padding:0 var(--gut) 0 calc(var(--marge) + var(--gut));
+  min-height:60px;max-width:1600px;margin:0 auto;
+}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;flex:0 0 auto}
+.logo-fig{width:34px;color:var(--ink);flex:0 0 auto}
+.logo-txt{font-family:var(--f-display);font-weight:700;font-size:21px;text-transform:uppercase;line-height:1}
+.logo-txt em{display:block;font-family:var(--f-mono);font-style:normal;font-size:9.5px;letter-spacing:.1em;color:var(--ink-2);margin-top:2px;text-transform:uppercase}
+
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav a{
+  display:flex;align-items:baseline;gap:6px;text-decoration:none;
+  font-size:14px;color:var(--ink-2);padding:8px 11px;
+  transition:color var(--t),background var(--t);
+}
+.nav a i{font-family:var(--f-mono);font-style:normal;font-size:10px;color:var(--ink-3)}
+.nav a:hover,.nav a.is-here{color:var(--ink);background:var(--paper-3)}
+.nav a.is-here i{color:var(--minium)}
+/* le bouton porte la planche 06 : la nav passe donc de 05 à 07 sans trou */
+.bar-cta{flex:0 0 auto}
+.bar-cta i{font-family:var(--f-mono);font-style:normal;font-size:10px;opacity:.7;margin-right:2px}
+.burger{display:none;width:42px;height:42px;background:var(--paper-3);border:1px solid var(--line);cursor:pointer;padding:0;place-items:center}
+.burger span{display:block;width:17px;height:1.5px;background:var(--ink);margin:3px auto;transition:transform var(--t),opacity var(--t)}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(4.5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-4.5px) rotate(-45deg)}
+
+/* ---------- 05. PLANCHES ---------- */
+.pl{border-bottom:1px solid var(--line);padding:clamp(40px,5vw,74px) 0}
+.pl-in{max-width:1600px;margin:0 auto;padding:0 var(--gut) 0 calc(var(--marge) + var(--gut))}
+.pl-tint{background:var(--paper-2)}
+.pl-dark{background:var(--dark);color:var(--paper);border-bottom-color:var(--dark-2)}
+.pl-dark .ph-note,.pl-dark p{color:#A8B4BB}
+.pl-dark h2,.pl-dark h3{color:var(--paper)}
+
+.ph{display:flex;flex-direction:column;gap:12px;max-width:66ch;margin-bottom:clamp(26px,3vw,42px)}
+.planche{display:flex;align-items:center;gap:11px;font-family:var(--f-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-2)}
+.pl-dark .planche{color:#A8B4BB}
+.pastille{
+  display:inline-grid;place-items:center;width:26px;height:26px;flex:0 0 auto;
+  border:1px solid var(--minium);border-radius:50%;color:var(--minium);
+  font-size:11px;letter-spacing:0;
+}
+.ph-note{font-size:15px;color:var(--ink-2);max-width:62ch}
+
+h1{font-size:clamp(46px,7.4vw,104px);letter-spacing:-.01em}
+h2{font-size:clamp(28px,3.6vw,50px)}
+h3{font-size:clamp(17px,1.35vw,21px);letter-spacing:.01em}
+.lede{font-size:clamp(15.5px,1.15vw,18px);color:var(--ink-2);max-width:54ch}
+
+/* ---------- 06. PAGE DE GARDE ---------- */
+.pl-hero{padding-top:clamp(30px,3.4vw,52px)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:clamp(26px,3.6vw,64px);align-items:center}
+.hero-txt{display:flex;flex-direction:column;gap:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+
+/* les spécifications de la page de garde : un tableau de caractéristiques */
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:10px 0 0;border-top:1px solid var(--line)}
+.specs div{padding:12px 12px 12px 0;border-right:1px solid var(--line)}
+.specs div:last-child{border-right:0}
+.specs dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.specs dd{margin:4px 0 0;font-family:var(--f-display);font-weight:700;font-size:clamp(26px,2.6vw,38px);line-height:1}
+
+/* élévation cotée */
+.elev{margin:0}
+.elev svg{width:100%;height:auto;background:var(--paper-2);border:1px solid var(--line)}
+.elev figcaption{margin-top:9px;font-size:13px;color:var(--ink-2)}
+.elev figcaption b{color:var(--minium);font-weight:600}
+
+/* traits du dessin technique */
+.draw .body{fill:none;stroke:var(--ink);stroke-width:2}
+.draw .face{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.2}
+.draw .lettre{fill:var(--ink);stroke:none}
+.thin{stroke:var(--ink-3);stroke-width:1;fill:none}
+.thick{stroke:var(--ink);stroke-width:2;fill:none}
+.rep{fill:none;stroke:var(--minium);stroke-width:1.4}
+.rep-t{font-family:var(--f-mono);font-size:12px;fill:var(--minium);text-anchor:middle}
+.cot{font-family:var(--f-mono);font-size:12px;fill:var(--minium)}
+.dim path{stroke:var(--minium);stroke-width:1;fill:none}
+.dim path.fill{fill:var(--minium);stroke:none}
+.dim path.thin{stroke:var(--minium);opacity:.5}
+
+/* les cotes se tracent : c'est le geste du dessinateur, une seule fois */
+html.js .dim path{stroke-dasharray:var(--len,260);stroke-dashoffset:var(--len,260)}
+html.js .dim path.fill{opacity:0}
+html.js .elev.in .dim path{animation:trace 900ms var(--ease) forwards}
+html.js .elev.in .dim path.fill{animation:pop 260ms var(--ease) 820ms forwards}
+@keyframes trace{to{stroke-dashoffset:0}}
+@keyframes pop{to{opacity:1}}
+
+/* ---------- 07. BOUTONS ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--f-body);font-size:14px;font-weight:600;text-decoration:none;
+  padding:12px 20px;border:1px solid transparent;cursor:pointer;
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.btn-red{background:var(--minium);color:#fff}
+.btn-red:hover{background:var(--minium-2)}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-line:hover{background:var(--ink);color:var(--paper)}
+.pl-dark .btn-line{color:var(--paper);border-color:var(--paper)}
+.pl-dark .btn-line:hover{background:var(--paper);color:var(--ink)}
+.btn-wa{background:#1FA855;color:#fff}
+.btn-wa:hover{background:#17904A}
+.wa{width:17px;height:17px;flex:0 0 auto;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.06c-.24.68-1.42 1.31-1.95 1.36-.5.05-.95.23-3.2-.67-2.7-1.06-4.4-3.8-4.53-3.98-.13-.18-1.08-1.44-1.08-2.75s.69-1.95.93-2.22c.24-.26.53-.33.7-.33.18 0 .35 0 .5.01.16.01.38-.06.59.45.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.1.18-.15.29-.29.45-.15.16-.31.36-.44.48-.15.14-.3.3-.13.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.29 2.33 1.44.29.14.46.12.63-.07.18-.2.73-.85.92-1.14.19-.29.39-.24.65-.14.27.09 1.67.79 1.96.93.29.14.48.21.55.33.07.11.07.66-.17 1.34Z'/></svg>") center/contain no-repeat;
+          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.06c-.24.68-1.42 1.31-1.95 1.36-.5.05-.95.23-3.2-.67-2.7-1.06-4.4-3.8-4.53-3.98-.13-.18-1.08-1.44-1.08-2.75s.69-1.95.93-2.22c.24-.26.53-.33.7-.33.18 0 .35 0 .5.01.16.01.38-.06.59.45.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.1.18-.15.29-.29.45-.15.16-.31.36-.44.48-.15.14-.3.3-.13.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.29 2.33 1.44.29.14.46.12.63-.07.18-.2.73-.85.92-1.14.19-.29.39-.24.65-.14.27.09 1.67.79 1.96.93.29.14.48.21.55.33.07.11.07.66-.17 1.34Z'/></svg>") center/contain no-repeat}
+
+/* ---------- 08. ATELIERS ---------- */
+.ats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.at{background:var(--paper);padding:clamp(20px,2vw,30px);display:flex;flex-direction:column;gap:10px;transition:background var(--t)}
+.at:hover{background:var(--paper-2)}
+.at-fig{width:120px;color:var(--ink)}
+.at-fig svg .body{fill:none;stroke:var(--ink);stroke-width:2}
+.at-fig svg .face{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.2}
+.at-k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--minium)}
+.at p{font-size:14.5px;color:var(--ink-2)}
+.kw{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:8px}
+.kw li{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);background:var(--paper-3);padding:4px 8px}
+
+/* ---------- 09. NOMENCLATURE ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:var(--gut)}
+.filter{
+  font-family:var(--f-body);font-size:13.5px;color:var(--ink-2);background:var(--paper);
+  border:0;padding:10px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:background var(--t),color var(--t);flex:1 1 auto;justify-content:center;
+}
+.filter span{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3)}
+.filter:hover{background:var(--paper-3);color:var(--ink)}
+.filter.is-on{background:var(--ink);color:var(--paper)}
+.filter.is-on span{color:#9AA6AD}
+
+.nom{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.pc{background:var(--paper);padding:clamp(16px,1.6vw,22px);display:flex;flex-direction:column;gap:8px;transition:background var(--t)}
+.pc:hover{background:var(--paper-2)}
+.pc-fig{background:var(--paper-2);border-bottom:1px solid var(--line);margin:calc(-1 * clamp(16px,1.6vw,22px)) calc(-1 * clamp(16px,1.6vw,22px)) 6px}
+.pc-fig svg{width:100%;height:auto}
+.pc-fig .body{fill:none;stroke:var(--ink);stroke-width:1.8}
+.pc-fig .face{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.1}
+.pc-fig .fill{fill:var(--ink)}
+.pc-fig .fill-soft{fill:var(--ink-3)}
+.pc-fig .halo{fill:var(--paper-3)}
+.pc-fig .dimline{stroke:var(--minium);stroke-width:1}
+.pc-ref{color:var(--minium);letter-spacing:.08em}
+.pc-desc{font-size:14px;color:var(--ink-2)}
+.pc-spec{margin-top:auto;padding-top:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:3px}
+.pc-spec li{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
+.pc-spec span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.pc-spec b{font-weight:500;color:var(--ink-2);text-align:right}
+.empty{padding:26px;border:1px solid var(--line);border-top:0;color:var(--ink-2);background:var(--paper)}
+
+/* hachure de coupe : le motif à 45° du dessin technique, défini une fois en SVG */
+.hatch{fill:url(#hachure);stroke:var(--ink);stroke-width:1.1}
+
+/* ---------- 10. BORDEREAU ---------- */
+.table-wrap{overflow-x:auto;border:1px solid var(--line)}
+.bord{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--paper);min-width:760px}
+.bord th,.bord td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.bord thead th{
+  font-family:var(--f-mono);font-size:10.5px;font-weight:400;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-2);background:var(--paper-3);border-bottom:1px solid var(--ink-3);
+}
+.bord tbody th{font-family:var(--f-display);font-size:19px;font-weight:600;text-transform:uppercase;white-space:nowrap}
+.bord tbody th em{display:block;font-family:var(--f-body);font-style:normal;font-size:12px;font-weight:400;text-transform:none;color:var(--ink-2);letter-spacing:0}
+.bord tbody tr:last-child th,.bord tbody tr:last-child td{border-bottom:0}
+.bord tbody tr:hover{background:var(--paper-2)}
+.c-ref{color:var(--minium);white-space:nowrap}
+.bord td:last-child{color:var(--ink-2)}
+
+.strip{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  margin-top:var(--gut);padding:16px 18px;background:var(--paper-3);
+}
+.strip p{font-size:14.5px;color:var(--ink-2)}
+.strip-dark{background:var(--dark-2);margin-top:var(--gut);display:block}
+
+/* ---------- 11. GAMME ---------- */
+.gamme{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--dark-2);border:1px solid var(--dark-2)}
+.ph-step{background:var(--dark);padding:clamp(18px,1.8vw,26px);display:flex;flex-direction:column;gap:9px;transition:background var(--t)}
+.ph-step:hover{background:var(--dark-2)}
+.ph-no{font-family:var(--f-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--minium)}
+.ph-step p:last-child{font-size:14px}
+
+/* ---------- 12. AFFAIRES ---------- */
+.affaires{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.af{background:var(--paper);padding:clamp(18px,1.8vw,26px);display:flex;flex-direction:column;gap:9px;transition:background var(--t)}
+.af:hover{background:var(--paper-2)}
+.af-fig{background:var(--paper-2);border-bottom:1px solid var(--line);margin:calc(-1 * clamp(18px,1.8vw,26px)) calc(-1 * clamp(18px,1.8vw,26px)) 6px}
+.af-fig svg{width:100%;height:auto}
+.af-fig .face{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.2}
+.af-fig .fill{fill:var(--ink)}
+.af-fig .body{fill:none;stroke:var(--ink);stroke-width:1.6}
+.af-fig .rep{fill:none;stroke:var(--minium);stroke-width:1.2}
+.af-fig .dimline{stroke:var(--minium);stroke-width:1}
+.af-k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--minium)}
+.af p:last-child{font-size:14px;color:var(--ink-2)}
+
+/* ---------- 13. DOSSIER (formulaire) ---------- */
+.dev{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+form{background:var(--paper);padding:clamp(20px,2.2vw,32px);display:flex;flex-direction:column;gap:14px}
+.dev-aside{background:var(--paper-2);padding:clamp(20px,2.2vw,32px);display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.opt{letter-spacing:0;text-transform:none}
+input,select,textarea{
+  font-family:var(--f-body);font-size:15px;color:var(--ink);
+  background:var(--paper-2);border:1px solid var(--line);border-radius:0;
+  padding:11px 13px;width:100%;transition:border-color var(--t),background var(--t);
+}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+input:focus,select:focus,textarea:focus{outline:0;background:#fff;border-color:var(--ink)}
+input:user-invalid,select:user-invalid{border-color:var(--minium)}
+textarea{resize:vertical;min-height:100px}
+select{appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%234A575F' stroke-width='1.6'/></svg>");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:11px;padding-right:36px}
+.form-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:2px}
+.hint{font-size:13px;color:var(--ink-2)}
+.hint.ok{color:#177A42;font-weight:600}
+.hint.err{color:var(--minium);font-weight:600}
+.aside-k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.aside-list{display:flex;flex-direction:column;gap:10px}
+.aside-list li{font-size:14px;color:var(--ink-2);padding-left:18px;position:relative}
+.aside-list li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:1px;background:var(--minium)}
+.aside-list b{color:var(--ink);font-weight:600}
+.tel{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,2.2vw,30px);text-decoration:none;line-height:1}
+.tel:hover{color:var(--minium)}
+.status{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);flex:0 0 auto}
+.status-dot.open{background:#177A42}
+.status-dot.closed{background:var(--minium)}
+
+/* ---------- 14. CONTACT ---------- */
+.cts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.ct{background:var(--paper);padding:clamp(20px,2.2vw,30px);display:flex;flex-direction:column;gap:11px}
+address{font-style:normal;font-size:15px;line-height:1.65}
+.lnk{font-size:14px;font-weight:600;color:var(--minium);text-decoration:none;border-bottom:1px solid currentColor;align-self:flex-start}
+.lnk:hover{color:var(--ink)}
+.coords{font-size:12px;color:var(--ink-3)}
+.hours{width:100%;border-collapse:collapse;font-size:14px}
+.hours th,.hours td{text-align:left;padding:5px 0;font-weight:400;border-bottom:1px dashed var(--line)}
+.hours th{color:var(--ink-2)}
+.hours td{text-align:right;font-size:13px}
+.hours tr.today th,.hours tr.today td{color:var(--ink);font-weight:600}
+.hours .closed{color:var(--minium)}
+.ct-cta{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.tel-lg{font-size:clamp(24px,2.4vw,32px)}
+
+/* ---------- 15. CARTOUCHE ---------- */
+.cart{background:var(--paper-2);padding:clamp(26px,3vw,44px) 0 20px}
+.cart-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr;gap:1px;background:var(--ink-3);border:1px solid var(--ink-3)}
+.cart-cell{background:var(--paper-2);padding:16px 18px;display:flex;flex-direction:column;gap:5px}
+.cart-k{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.cart-v{font-size:15px;font-weight:500}
+.cart-v a{text-decoration:none}
+.cart-v a:hover{color:var(--minium)}
+.cart-id .cart-v{font-family:var(--f-display);font-weight:700;font-size:22px;text-transform:uppercase}
+.cart-s{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.cart-nav{display:flex;flex-direction:column;gap:3px}
+.cart-nav a{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);text-decoration:none;width:fit-content}
+.cart-nav a:hover{color:var(--minium)}
+.cart-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}
+.cart-foot{margin-top:12px;font-size:12px;color:var(--ink-3)}
+
+/* ---------- 16. WHATSAPP FLOTTANT ---------- */
+.wa-float{
+  position:fixed;right:16px;bottom:16px;z-index:85;width:52px;height:52px;
+  background:#1FA855;color:#fff;display:grid;place-items:center;text-decoration:none;
+  transition:background var(--t),transform var(--t);
+}
+.wa-float:hover{background:#17904A;transform:translateY(-2px)}
+.wa-float .wa{width:25px;height:25px}
+
+/* ---------- 17. MOUVEMENT ---------- */
+/* le trait apparaît, comme un calque qu'on pose : rien de plus */
+html.js .pl .ph,html.js .ats,html.js .nom,html.js .table-wrap,
+html.js .gamme,html.js .affaires,html.js .dev,html.js .cts,html.js .elev{
+  opacity:0;transform:translateY(10px);
+}
+html.js .in{opacity:1;transform:none;transition:opacity 480ms var(--ease),transform 480ms var(--ease)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.js .pl .ph,html.js .ats,html.js .nom,html.js .table-wrap,
+  html.js .gamme,html.js .affaires,html.js .dev,html.js .cts,html.js .elev{opacity:1;transform:none}
+  html.js .dim path{stroke-dashoffset:0}
+  html.js .dim path.fill{opacity:1}
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ---------- 18. FORMATS RÉDUITS ---------- */
+@media (max-width:1100px){
+  .hero{grid-template-columns:1fr;gap:26px}
+  .ats,.cts{grid-template-columns:1fr}
+  .gamme{grid-template-columns:1fr 1fr}
+  .dev{grid-template-columns:1fr}
+  .cart-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  .nav{
+    position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:8px;display:none;
+  }
+  .bar{position:sticky}
+  .bar-in{position:relative}
+  .nav.open{display:flex}
+  .nav a{padding:12px;font-size:16px}
+  .burger{display:grid;margin-left:auto;order:3}
+  .bar-cta{order:2;margin-left:auto;font-size:13px;padding:10px 14px}
+  .logo{order:1}
+}
+@media (max-width:720px){
+  :root{--marge:20px}
+  .rule{background-size:6px 20px,11px 100px}
+  .specs{grid-template-columns:1fr 1fr}
+  .specs div{border-bottom:1px solid var(--line)}
+  .gamme{grid-template-columns:1fr}
+  .nom{grid-template-columns:1fr 1fr}
+  .field-row{grid-template-columns:1fr}
+  .cart-grid{grid-template-columns:1fr}
+  .strip{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:520px){
+  .nom{grid-template-columns:1fr}
+  .rule{display:none}
+  :root{--marge:0px}
+}
+
+/* ---------- hidden : le filtre doit primer sur le display des blocs ---------- */
+[hidden]{display:none !important}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>CMY Imprimerie Design</title>
+  <rect width="64" height="64" fill="#06080d"/>
+  <defs>
+    <filter id="lueur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="f"/>
+      <feMerge><feMergeNode in="f"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#lueur)">
+    <rect x="12" y="26" width="40" height="12" rx="6" fill="#ffb020"/>
+  </g>
+  <rect x="12" y="46" width="40" height="4" rx="2" fill="#ffb020" opacity=".35"/>
+</svg>

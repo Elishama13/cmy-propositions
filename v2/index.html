@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fr" data-mode="nuit">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- proposition en cours de validation : pas d\'indexation -->
+<meta name="robots" content="noindex, nofollow">
+<title>CMY Imprimerie Design — On fabrique ce qui se voit de loin | Abidjan</title>
+<meta name="description" content="Enseignes lumineuses, totems, habillage de façade en alucobond et impression grand format à Koumassi, Abidjan. Fabrication, pose et vente de matières premières pour enseignistes.">
+<meta name="theme-color" content="#07090E">
+<meta property="og:title" content="CMY Imprimerie Design — Abidjan">
+<meta property="og:description" content="On fabrique ce qui se voit de loin. Enseignes lumineuses, totems, façades alucobond, impression grand format.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_CI">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300..900&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "CMY IMPRIMERIE DESIGN",
+  "description": "Entreprise de publicité spécialisée dans les enseignes lumineuses, le revêtement de façade en alucobond, les panneaux et totems, l'impression vinyle et bâche, et la vente de matières premières pour enseignes.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Koumassi, à 50 m de la pharmacie du Soleil",
+    "addressLocality": "Abidjan",
+    "addressCountry": "CI"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 5.29572778, "longitude": -3.97906667 },
+  "telephone": "+2250789736267",
+  "sameAs": ["https://www.facebook.com/profile.php?id=61580673156778"],
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "17:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "13:00" }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<!-- la lampe que l'on promène sur la façade : suit le curseur, mode nuit seulement -->
+<div class="lampe" aria-hidden="true"></div>
+
+<header class="barre" id="barre">
+  <div class="barre-in">
+    <a class="logo" href="#haut">
+      <span class="logo-tube" aria-hidden="true"></span>
+      <span class="logo-txt">CMY<em>Imprimerie Design</em></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="#deux-vies">Deux vies</a>
+      <a href="#pieces">Nos pièces</a>
+      <a href="#depot">Le dépôt</a>
+      <a href="#methode">Méthode</a>
+      <a href="#chantiers">Chantiers</a>
+      <a href="#atelier">Atelier</a>
+    </nav>
+
+    <!-- LE GESTE : l'interrupteur. Une enseigne a deux vies, le site aussi. -->
+    <button class="switch" id="switch" type="button" role="switch" aria-checked="true"
+            aria-label="Basculer entre le mode nuit et le mode jour">
+      <span class="switch-piste"><span class="switch-bille"></span></span>
+      <span class="switch-etat" id="switchEtat">Nuit</span>
+    </button>
+
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Ouvrir le menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+<section class="hero" id="haut">
+  <div class="hero-halo" aria-hidden="true"></div>
+
+  <div class="cadre hero-in">
+    <p class="sur">
+      <span class="pastille" id="pastille"></span>
+      <span id="etatAtelier">Atelier de Koumassi</span>
+      <b>·</b> Abidjan, Côte d'Ivoire
+    </p>
+
+    <h1 class="titre-geant">
+      On fabrique<br>
+      ce qui <span class="neon" id="neon"><span>se&nbsp;voit</span></span><br>
+      de loin.
+    </h1>
+
+    <div class="hero-bas">
+      <p class="chapo">
+        Enseignes lumineuses, totems, habillage de façade en alucobond, impression grand format.
+        Du relevé de cotes à la mise sous tension — et la matière première si vous fabriquez vous-même.
+      </p>
+      <div class="hero-actions">
+        <a class="cta cta-plein" href="#devis">Demander un devis</a>
+        <a class="cta cta-creux" href="#pieces">Voir nos pièces</a>
+      </div>
+    </div>
+
+    <!-- rangée de caissons qui s'allument un par un -->
+    <div class="facade" aria-hidden="true">
+      <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
+      <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
+      <span style="--d:6"></span><span style="--d:7"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ DEUX VIES ═══════════════════════════ -->
+<section class="sec" id="deux-vies">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">01</p>
+      <h2>Une enseigne<br>a deux vies.</h2>
+      <p class="entete-txt">
+        Le jour, elle tient par sa matière et son relief. La nuit, elle ne tient plus que par
+        sa lumière. Nous dessinons les deux en même temps — c'est la seule façon d'obtenir
+        une enseigne qui fonctionne aux deux heures.
+      </p>
+    </div>
+
+    <div class="vies">
+      <article class="vie">
+        <div class="vie-scene v-jour" aria-hidden="true">
+          <span class="v-mur"></span><span class="v-bandeau"></span>
+          <span class="v-l1"></span><span class="v-l2"></span><span class="v-l3"></span>
+          <span class="v-sol"></span>
+        </div>
+        <p class="etiq">08:00 — 18:00</p>
+        <h3>Le jour, le relief</h3>
+        <p>Composite thermolaqué, chants nets, lettres déportées du mur. C'est l'épaisseur et
+           la qualité de pliage qui font la différence à trois mètres.</p>
+      </article>
+
+      <article class="vie">
+        <div class="vie-scene v-nuit" aria-hidden="true">
+          <span class="v-mur"></span><span class="v-bandeau"></span>
+          <span class="v-l1"></span><span class="v-l2"></span><span class="v-l3"></span>
+          <span class="v-sol"></span>
+        </div>
+        <p class="etiq">18:00 — 08:00</p>
+        <h3>La nuit, la lumière</h3>
+        <p>Modules LED calibrés, diffusion homogène, pas de points chauds sur la face.
+           C'est là qu'on voit qui a câblé sérieusement.</p>
+      </article>
+    </div>
+
+    <p class="incise">
+      <span class="incise-tube" aria-hidden="true"></span>
+      Essayez l'interrupteur en haut de la page — le site bascule comme une façade au coucher du soleil.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CATALOGUE ═══════════════════════════ -->
+<section class="sec sec-fond" id="pieces">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">02</p>
+      <h2>Ce qui sort<br>de l'atelier.</h2>
+      <p class="entete-txt">
+        Seize pièces courantes, toutes fabriquées sur mesure. Les références servent au devis :
+        citez-les au téléphone ou dans le formulaire, on gagne un aller-retour.
+      </p>
+    </div>
+
+    <div class="tris" role="group" aria-label="Filtrer les pièces">
+      <button type="button" class="tri actif" data-cat="tout">Tout <i>16</i></button>
+      <button type="button" class="tri" data-cat="lumineux">Lumineux <i>5</i></button>
+      <button type="button" class="tri" data-cat="totems">Totems &amp; panneaux <i>4</i></button>
+      <button type="button" class="tri" data-cat="facade">Façade <i>2</i></button>
+      <button type="button" class="tri" data-cat="impression">Impression <i>3</i></button>
+      <button type="button" class="tri" data-cat="interieur">Intérieur <i>2</i></button>
+    </div>
+
+    <div class="pieces" id="listePieces">
+
+      <article class="piece" data-cat="lumineux" style="--led:var(--led-chaud)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Caisson lumineux">
+            <rect class="t" x="24" y="30" width="152" height="56" rx="2"/>
+            <rect class="f" x="36" y="42" width="128" height="32" rx="1"/>
+            <path class="t" d="M100 86v22M74 110h52"/>
+          </svg>
+        </div>
+        <p class="ref">ENS-01</p>
+        <h3>Caisson lumineux</h3>
+        <p class="desc">Simple ou double face. Alu thermolaqué, face plexiglas diffusant, LED intérieures.</p>
+      </article>
+
+      <article class="piece" data-cat="lumineux" style="--led:var(--led-froid)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Lettres boîtiers en relief">
+            <rect class="f" x="26" y="44" width="30" height="46" rx="1"/>
+            <rect class="f" x="66" y="44" width="30" height="46" rx="1"/>
+            <rect class="f" x="106" y="44" width="30" height="46" rx="1"/>
+            <rect class="f" x="146" y="44" width="30" height="46" rx="1"/>
+            <path class="t" d="M20 102h164"/>
+          </svg>
+        </div>
+        <p class="ref">ENS-02</p>
+        <h3>Lettres boîtiers 3D</h3>
+        <p class="desc">Découpe fraiseuse, chants alu ou PMMA, un module LED dans chaque lettre.</p>
+      </article>
+
+      <article class="piece" data-cat="lumineux" style="--led:var(--led-bleu)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Lettres rétro-éclairées">
+            <circle class="h" cx="100" cy="62" r="42"/>
+            <rect class="t" x="62" y="42" width="18" height="40" rx="1"/>
+            <rect class="t" x="90" y="42" width="18" height="40" rx="1"/>
+            <rect class="t" x="118" y="42" width="18" height="40" rx="1"/>
+            <path class="t" d="M56 106h88"/>
+          </svg>
+        </div>
+        <p class="ref">ENS-03</p>
+        <h3>Rétro-éclairage halo</h3>
+        <p class="desc">Lettres pleines déportées, lumière projetée vers le mur. Halo la nuit, relief le jour.</p>
+      </article>
+
+      <article class="piece" data-cat="lumineux" style="--led:var(--led-rouge)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Enseigne drapeau perpendiculaire">
+            <path class="t" d="M40 18v94M40 40h22"/>
+            <rect class="f" x="62" y="26" width="82" height="38" rx="2"/>
+            <path class="t" d="M62 78h82"/>
+          </svg>
+        </div>
+        <p class="ref">ENS-04</p>
+        <h3>Enseigne drapeau</h3>
+        <p class="desc">Perpendiculaire à la façade, lue dans les deux sens de circulation. Double face.</p>
+      </article>
+
+      <article class="piece" data-cat="lumineux" style="--led:var(--led-vert)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Caisson à visuel interchangeable">
+            <rect class="t" x="24" y="26" width="152" height="66" rx="2"/>
+            <rect class="f" x="36" y="38" width="112" height="42" rx="1"/>
+            <path class="t" d="M156 38v42M148 59h16"/>
+          </svg>
+        </div>
+        <p class="ref">ENS-05</p>
+        <h3>Caisson à visuel changeant</h3>
+        <p class="desc">La face s'ouvre, le visuel se remplace sans démonter le caisson. Cadre clic.</p>
+      </article>
+
+      <article class="piece" data-cat="totems" style="--led:var(--led-chaud)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Totem lumineux">
+            <rect class="f" x="76" y="14" width="48" height="40" rx="2"/>
+            <rect class="t" x="76" y="58" width="48" height="16" rx="1"/>
+            <path class="t" d="M100 74v32M70 110h60"/>
+          </svg>
+        </div>
+        <p class="ref">TOT-01</p>
+        <h3>Totem lumineux</h3>
+        <p class="desc">Identification en limite de parcelle : station, clinique, hôtel, centre commercial.</p>
+      </article>
+
+      <article class="piece" data-cat="totems" style="--led:var(--led-froid)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Totem multi-enseignes">
+            <rect class="f" x="72" y="14" width="56" height="20" rx="1"/>
+            <rect class="t" x="72" y="40" width="56" height="16" rx="1"/>
+            <rect class="t" x="72" y="62" width="56" height="16" rx="1"/>
+            <path class="t" d="M100 78v28M70 110h60"/>
+          </svg>
+        </div>
+        <p class="ref">TOT-02</p>
+        <h3>Totem multi-enseignes</h3>
+        <p class="desc">Un mât, plusieurs locataires. Chaque plaque se dépose quand une enseigne change.</p>
+      </article>
+
+      <article class="piece" data-cat="totems" style="--led:var(--led-rouge)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Panneau de chantier">
+            <rect class="t" x="30" y="24" width="140" height="60" rx="2"/>
+            <rect class="f" x="42" y="36" width="52" height="18" rx="1"/>
+            <path class="t" d="M42 64h86M42 74h58M50 84v26M150 84v26"/>
+          </svg>
+        </div>
+        <p class="ref">PAN-01</p>
+        <h3>Panneau de chantier</h3>
+        <p class="desc">Panneau sur pieds, palissade imprimée, habillage de clôture. Forex ou bâche sur cadre.</p>
+      </article>
+
+      <article class="piece" data-cat="totems" style="--led:var(--led-chaud)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Signalisation et sécurité">
+            <rect class="f" x="34" y="30" width="50" height="50" rx="2"/>
+            <path class="t" d="M59 42v18M59 66v4"/>
+            <circle class="t" cx="134" cy="54" r="26"/>
+            <path class="t" d="M118 54h32"/>
+            <path class="t" d="M30 104h140"/>
+          </svg>
+        </div>
+        <p class="ref">PAN-02</p>
+        <h3>Signalisation &amp; sécurité</h3>
+        <p class="desc">Consignes, plans d'évacuation, marquage de zones, circulation interne.</p>
+      </article>
+
+      <article class="piece" data-cat="facade" style="--led:var(--led-froid)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Bardage de façade en alucobond">
+            <rect class="t" x="22" y="20" width="72" height="42" rx="1"/>
+            <rect class="t" x="106" y="20" width="72" height="42" rx="1"/>
+            <rect class="t" x="22" y="74" width="72" height="42" rx="1"/>
+            <rect class="f" x="106" y="74" width="72" height="42" rx="1"/>
+          </svg>
+        </div>
+        <p class="ref">FAC-01</p>
+        <h3>Bardage alucobond</h3>
+        <p class="desc">Habillage complet : ossature, calepinage, pliage, pose. Joint creux régulier.</p>
+      </article>
+
+      <article class="piece" data-cat="facade" style="--led:var(--led-chaud)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Devanture et auvent">
+            <rect class="f" x="22" y="24" width="156" height="26" rx="1"/>
+            <rect class="t" x="22" y="60" width="52" height="46" rx="1"/>
+            <rect class="t" x="86" y="60" width="28" height="46" rx="1"/>
+            <rect class="t" x="126" y="60" width="52" height="46" rx="1"/>
+          </svg>
+        </div>
+        <p class="ref">FAC-02</p>
+        <h3>Devanture &amp; auvent</h3>
+        <p class="desc">Reprise complète : bandeau, auvent, encadrement de vitrine, enseigne assortie.</p>
+      </article>
+
+      <article class="piece" data-cat="impression" style="--led:var(--led-rouge)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Bâche et banderole">
+            <rect class="f" x="26" y="32" width="148" height="60" rx="1"/>
+            <path class="t" d="M44 56h80M44 72h48"/>
+            <circle class="t" cx="34" cy="40" r="3"/><circle class="t" cx="166" cy="40" r="3"/>
+            <circle class="t" cx="34" cy="84" r="3"/><circle class="t" cx="166" cy="84" r="3"/>
+          </svg>
+        </div>
+        <p class="ref">IMP-01</p>
+        <h3>Bâche &amp; banderole</h3>
+        <p class="desc">Impression PVC, ourlets soudés, œillets posés. Façade, événement ou clôture.</p>
+      </article>
+
+      <article class="piece" data-cat="impression" style="--led:var(--led-vert)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Adhésif et vitrophanie">
+            <rect class="t" x="26" y="22" width="148" height="86" rx="2"/>
+            <rect class="f" x="44" y="40" width="112" height="22" rx="1"/>
+            <path class="t" d="M44 76h64M44 90h40"/>
+          </svg>
+        </div>
+        <p class="ref">IMP-02</p>
+        <h3>Adhésif &amp; vitrophanie</h3>
+        <p class="desc">Lettrage, dépoli, one-way vision sur vitrine, habillage de cloison, marquage au sol.</p>
+      </article>
+
+      <article class="piece" data-cat="impression" style="--led:var(--led-chaud)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Covering de véhicule">
+            <path class="f" d="M32 84V56l24-20h64l26 22h22v26z"/>
+            <path class="t" d="M62 40v18M104 40v18"/>
+            <circle class="t" cx="70" cy="92" r="10"/><circle class="t" cx="146" cy="92" r="10"/>
+          </svg>
+        </div>
+        <p class="ref">IMP-03</p>
+        <h3>Covering véhicule</h3>
+        <p class="desc">Marquage partiel ou total : utilitaire, flotte, tricycle. Vinyle coulé, pose à chaud.</p>
+      </article>
+
+      <article class="piece" data-cat="interieur" style="--led:var(--led-froid)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Plaques et signalétique directionnelle">
+            <rect class="t" x="30" y="28" width="58" height="74" rx="2"/>
+            <path class="t" d="M44 48h30M44 62h20"/>
+            <path class="f" d="M104 40h50l14 14-14 14h-50z"/>
+            <rect class="t" x="104" y="82" width="64" height="20" rx="1"/>
+          </svg>
+        </div>
+        <p class="ref">SIG-01</p>
+        <h3>Plaques &amp; directionnel</h3>
+        <p class="desc">Plaques de porte, numérotation, fléchage d'étages, plaques professionnelles gravées.</p>
+      </article>
+
+      <article class="piece" data-cat="interieur" style="--led:var(--led-vert)">
+        <div class="scene">
+          <svg viewBox="0 0 200 130" role="img" aria-label="Chevalet, roll-up et stand">
+            <rect class="t" x="28" y="26" width="44" height="60" rx="1"/>
+            <path class="t" d="M28 86l-8 24M72 86l8 24"/>
+            <rect class="f" x="100" y="18" width="44" height="78" rx="1"/>
+            <path class="t" d="M94 104h56"/>
+            <rect class="t" x="160" y="44" width="16" height="52" rx="1"/>
+          </svg>
+        </div>
+        <p class="ref">SIG-02</p>
+        <h3>Chevalet, roll-up &amp; stand</h3>
+        <p class="desc">Supports mobiles pour boutique, salon, événement. Montage sans outil.</p>
+      </article>
+
+    </div>
+    <p class="vide" id="videPieces" hidden>Aucune pièce dans cette famille.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════ LE DÉPÔT ════════════════════════════ -->
+<section class="sec" id="depot">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">03</p>
+      <h2>Et si vous<br>fabriquez vous-même.</h2>
+      <p class="entete-txt">
+        Enseignistes, menuisiers alu, imprimeurs : on vend la matière au détail et en gros.
+        Retrait au dépôt de Koumassi ou livraison sur Abidjan.
+      </p>
+    </div>
+
+    <ul class="stock">
+      <li>
+        <p class="ref">MP-01</p>
+        <h3>Forex <em>PVC expansé</em></h3>
+        <p class="stock-fmt">1,22 × 2,44 m — 3, 5, 10 mm</p>
+        <p class="stock-use">Panneaux, signalétique intérieure, gabarits, lettrage découpé</p>
+      </li>
+      <li>
+        <p class="ref">MP-02</p>
+        <h3>Alucobond <em>composite aluminium</em></h3>
+        <p class="stock-fmt">1,22 × 2,44 m — 3 et 4 mm</p>
+        <p class="stock-use">Bardage de façade, caissons, totems, devantures</p>
+      </li>
+      <li>
+        <p class="ref">MP-03</p>
+        <h3>Plexiglas <em>PMMA coulé &amp; extrudé</em></h3>
+        <p class="stock-fmt">2, 3, 5 mm — transparent, opale, teinté</p>
+        <p class="stock-use">Faces de caisson, lettres boîtiers, plaques, présentoirs</p>
+      </li>
+      <li>
+        <p class="ref">MP-04</p>
+        <h3>Entretoises <em>fixations déportées</em></h3>
+        <p class="stock-fmt">Inox &amp; alu — Ø 12 à 25 mm, déport 15 à 40 mm</p>
+        <p class="stock-use">Pose de plaques et de lettres relief, effet de décollement</p>
+      </li>
+      <li>
+        <p class="ref">MP-05</p>
+        <h3>Transformateurs <em>alimentations</em></h3>
+        <p class="stock-fmt">12 V — 60 à 400 W · IP67 extérieur</p>
+        <p class="stock-use">Alimentation des modules LED, coffrets d'enseigne</p>
+      </li>
+      <li>
+        <p class="ref">MP-06</p>
+        <h3>Modules LED <em>rubans &amp; injectés</em></h3>
+        <p class="stock-fmt">12 V — blanc froid, blanc chaud, RVB · IP65/67</p>
+        <p class="stock-use">Caissons, lettres boîtiers, rétro-éclairage, contours</p>
+      </li>
+    </ul>
+
+    <p class="incise">
+      <span class="incise-tube" aria-hidden="true"></span>
+      Formats et coloris varient selon l'arrivage. Un appel avant de vous déplacer vous évite le trajet.
+      <a class="lien" href="#devis">Vérifier la disponibilité</a>
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════ MÉTHODE ════════════════════════════ -->
+<section class="sec sec-fond" id="methode">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">04</p>
+      <h2>Du relevé<br>à l'allumage.</h2>
+    </div>
+
+    <ol class="etapes">
+      <li>
+        <span class="etape-n">1</span>
+        <h3>On vient mesurer</h3>
+        <p>Relevé de la façade, vérification de l'arrivée électrique, photos de l'existant.</p>
+      </li>
+      <li>
+        <span class="etape-n">2</span>
+        <h3>Vous voyez avant</h3>
+        <p>Simulation sur la photo de votre façade, cotes et prix ferme. Vous validez le BAT.</p>
+      </li>
+      <li>
+        <span class="etape-n">3</span>
+        <h3>On fabrique</h3>
+        <p>Découpe, pliage, assemblage et câblage à Koumassi. Test d'allumage avant le départ.</p>
+      </li>
+      <li>
+        <span class="etape-n">4</span>
+        <h3>On pose et on allume</h3>
+        <p>Fixation, raccordement, réglage, nettoyage du chantier. Puis on attend la nuit.</p>
+      </li>
+    </ol>
+
+    <p class="incise">
+      <span class="incise-tube" aria-hidden="true"></span>
+      Après la pose : dépannage LED, remplacement de face et nettoyage d'enseigne sur simple appel.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CHANTIERS ═══════════════════════════ -->
+<section class="sec" id="chantiers">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">05</p>
+      <h2>Le genre de chantier<br>qu'on mène.</h2>
+    </div>
+
+    <div class="chantiers">
+      <article class="ch ch-large">
+        <div class="ch-scene c1" aria-hidden="true">
+          <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
+        </div>
+        <p class="etiq">Façade complète · Alucobond + lettres boîtiers</p>
+        <h3>Devanture de commerce</h3>
+        <p>Bandeau habillé en composite, lettres lumineuses en applique, vitrophanie assortie.</p>
+      </article>
+
+      <article class="ch ch-large">
+        <div class="ch-scene c2" aria-hidden="true">
+          <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
+        </div>
+        <p class="etiq">Implantation · Totem double face</p>
+        <h3>Totem d'entrée de site</h3>
+        <p>Massif béton, mât acier, habillage composite. Visible depuis la voie de circulation.</p>
+      </article>
+
+      <article class="ch">
+        <div class="ch-scene c3" aria-hidden="true">
+          <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
+        </div>
+        <p class="etiq">Impression · Bâche façade</p>
+        <h3>Habillage événementiel</h3>
+        <p>Bâche grand format tendue sur ossature, posée le temps d'une campagne.</p>
+      </article>
+
+      <article class="ch">
+        <div class="ch-scene c4" aria-hidden="true">
+          <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
+        </div>
+        <p class="etiq">Flotte · Covering vinyle</p>
+        <h3>Marquage de véhicules</h3>
+        <p>Une même charte déclinée sur utilitaires, tricycles et véhicules de direction.</p>
+      </article>
+
+      <article class="ch">
+        <div class="ch-scene c5" aria-hidden="true">
+          <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
+        </div>
+        <p class="etiq">Intérieur · Signalétique</p>
+        <h3>Orientation de bâtiment</h3>
+        <p>Plaques de porte, fléchage d'étages, plans d'évacuation sur une même famille.</p>
+      </article>
+    </div>
+
+    <p class="incise">
+      <span class="incise-tube" aria-hidden="true"></span>
+      Les photos de chantiers terminés sont publiées sur notre page Facebook.
+      <a class="lien" href="https://www.facebook.com/profile.php?id=61580673156778" target="_blank" rel="noopener">Voir la page</a>
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DEVIS ════════════════════════════ -->
+<section class="sec sec-fond" id="devis">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">06</p>
+      <h2>Dites-nous<br>ce qu'il vous faut.</h2>
+      <p class="entete-txt">
+        Le formulaire prépare le message et l'ouvre dans WhatsApp. Vous relisez, vous envoyez.
+        Rien n'est stocké sur ce site.
+      </p>
+    </div>
+
+    <div class="devis">
+      <form class="form" id="formDevis" novalidate>
+        <div class="champ">
+          <label for="d-nom">Nom et prénom</label>
+          <input id="d-nom" name="nom" type="text" autocomplete="name" placeholder="Ex. Konan Aya" required>
+        </div>
+        <div class="champ">
+          <label for="d-soc">Entreprise <span class="fac">facultatif</span></label>
+          <input id="d-soc" name="societe" type="text" autocomplete="organization" placeholder="Ex. Pharmacie du Soleil">
+        </div>
+        <div class="champ">
+          <label for="d-obj">Ce que vous voulez</label>
+          <select id="d-obj" name="objet" required>
+            <option value="">Choisir dans la liste</option>
+            <optgroup label="Lumineux">
+              <option>Caisson lumineux (ENS-01)</option>
+              <option>Lettres boîtiers 3D (ENS-02)</option>
+              <option>Rétro-éclairage halo (ENS-03)</option>
+              <option>Enseigne drapeau (ENS-04)</option>
+              <option>Caisson à visuel changeant (ENS-05)</option>
+            </optgroup>
+            <optgroup label="Totems &amp; panneaux">
+              <option>Totem lumineux (TOT-01)</option>
+              <option>Totem multi-enseignes (TOT-02)</option>
+              <option>Panneau de chantier (PAN-01)</option>
+              <option>Signalisation &amp; sécurité (PAN-02)</option>
+            </optgroup>
+            <optgroup label="Façade">
+              <option>Bardage alucobond (FAC-01)</option>
+              <option>Devanture &amp; auvent (FAC-02)</option>
+            </optgroup>
+            <optgroup label="Impression">
+              <option>Bâche &amp; banderole (IMP-01)</option>
+              <option>Adhésif &amp; vitrophanie (IMP-02)</option>
+              <option>Covering véhicule (IMP-03)</option>
+            </optgroup>
+            <optgroup label="Intérieur">
+              <option>Plaques &amp; directionnel (SIG-01)</option>
+              <option>Chevalet, roll-up &amp; stand (SIG-02)</option>
+            </optgroup>
+            <optgroup label="Dépôt">
+              <option>Achat de matière première</option>
+            </optgroup>
+            <option>Autre — je précise ci-dessous</option>
+          </select>
+        </div>
+        <div class="champ-duo">
+          <div class="champ">
+            <label for="d-dim">Dimensions ou quantité</label>
+            <input id="d-dim" name="dim" type="text" placeholder="Ex. 4 m × 1,20 m">
+          </div>
+          <div class="champ">
+            <label for="d-lieu">Commune</label>
+            <input id="d-lieu" name="lieu" type="text" placeholder="Ex. Koumassi">
+          </div>
+        </div>
+        <div class="champ">
+          <label for="d-msg">Détails</label>
+          <textarea id="d-msg" name="msg" rows="4" placeholder="Support existant, délai souhaité, arrivée électrique sur place, logo disponible…"></textarea>
+        </div>
+        <div class="form-pied">
+          <button class="cta cta-wa" type="submit"><span class="wa" aria-hidden="true"></span>Envoyer sur WhatsApp</button>
+          <p class="form-note" id="formNote" role="status">Vous relisez le message avant l'envoi.</p>
+        </div>
+      </form>
+
+      <aside class="cote">
+        <p class="cote-t">Ce qui accélère le chiffrage</p>
+        <ul class="cote-l">
+          <li><b>Une photo de la façade.</b> Elle remplace trois paragraphes de description.</li>
+          <li><b>Votre logo en vectoriel</b> (.ai, .eps, .pdf, .svg). Sinon la reprise de fichier est facturée.</li>
+          <li><b>Les cotes réelles</b> — largeur du bandeau, hauteur sous auvent. C'est ce qui permet un prix ferme.</li>
+        </ul>
+        <p class="cote-t">Ou appelez</p>
+        <a class="tel" href="tel:+2250789736267">+225 07 89 73 62 67</a>
+        <p class="cote-h">Lundi à vendredi 08:00–17:00 · Samedi 09:00–13:00</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ ATELIER ═══════════════════════════ -->
+<section class="sec" id="atelier">
+  <div class="cadre">
+    <div class="entete">
+      <p class="num">07</p>
+      <h2>Koumassi,<br>Abidjan.</h2>
+    </div>
+
+    <div class="infos">
+      <div class="bloc">
+        <p class="cote-t">L'adresse</p>
+        <address>Koumassi, à 50 m de la pharmacie du Soleil<br>Abidjan — Côte d'Ivoire</address>
+        <a class="lien" href="https://www.google.com/maps/search/?api=1&amp;query=5.29572778,-3.97906667" target="_blank" rel="noopener">Ouvrir dans Google Maps</a>
+        <p class="gps">5.295728 N · 3.979067 O</p>
+      </div>
+
+      <div class="bloc">
+        <p class="cote-t">Les horaires</p>
+        <table class="horaires" id="tableHoraires">
+          <tbody>
+            <tr data-jour="1"><th scope="row">Lundi</th><td>08:00 – 17:00</td></tr>
+            <tr data-jour="2"><th scope="row">Mardi</th><td>08:00 – 17:00</td></tr>
+            <tr data-jour="3"><th scope="row">Mercredi</th><td>08:00 – 17:00</td></tr>
+            <tr data-jour="4"><th scope="row">Jeudi</th><td>08:00 – 17:00</td></tr>
+            <tr data-jour="5"><th scope="row">Vendredi</th><td>08:00 – 17:00</td></tr>
+            <tr data-jour="6"><th scope="row">Samedi</th><td>09:00 – 13:00</td></tr>
+            <tr data-jour="0"><th scope="row">Dimanche</th><td class="off">Fermé</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bloc">
+        <p class="cote-t">Nous joindre</p>
+        <a class="tel" href="tel:+2250789736267">+225 07 89 73 62 67</a>
+        <div class="bloc-actions">
+          <a class="cta cta-wa" href="https://wa.me/2250789736267" target="_blank" rel="noopener"><span class="wa" aria-hidden="true"></span>WhatsApp</a>
+          <a class="cta cta-creux" href="https://www.facebook.com/profile.php?id=61580673156778" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pied">
+  <div class="cadre">
+    <div class="pied-haut">
+      <a class="logo" href="#haut">
+        <span class="logo-tube" aria-hidden="true"></span>
+        <span class="logo-txt">CMY<em>Imprimerie Design</em></span>
+      </a>
+      <nav class="pied-nav" aria-label="Pied de page">
+        <a href="#deux-vies">Deux vies</a>
+        <a href="#pieces">Nos pièces</a>
+        <a href="#depot">Le dépôt</a>
+        <a href="#methode">Méthode</a>
+        <a href="#chantiers">Chantiers</a>
+        <a href="#devis">Devis</a>
+      </nav>
+      <div class="pied-contact">
+        <a class="lien" href="tel:+2250789736267">+225 07 89 73 62 67</a>
+        <a class="lien" href="https://wa.me/2250789736267" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="lien" href="https://www.facebook.com/profile.php?id=61580673156778" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+    <div class="pied-bas">
+      <p>© <span id="annee">2026</span> CMY Imprimerie Design — Publicité, enseignes &amp; impression grand format.</p>
+      <p class="pied-note">Proposition 2 · <a class="lien" href="../">voir la proposition 1</a></p>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-flottant" href="https://wa.me/2250789736267" target="_blank" rel="noopener" aria-label="Écrire à CMY sur WhatsApp">
+  <span class="wa" aria-hidden="true"></span>
+</a>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
