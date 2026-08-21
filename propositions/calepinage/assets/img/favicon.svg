@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- calepinage : quatre panneaux, joint creux, un panneau allumé -->
-  <rect width="32" height="32" fill="#14181C"/>
-  <rect x="3"  y="3"  width="12" height="12" rx="1" fill="#C6CCD0"/>
-  <rect x="17" y="3"  width="12" height="12" rx="1" fill="#FFC22E"/>
-  <rect x="3"  y="17" width="12" height="12" rx="1" fill="#E4E7E9"/>
-  <rect x="17" y="17" width="12" height="12" rx="1" fill="#C6CCD0"/>
-</svg>

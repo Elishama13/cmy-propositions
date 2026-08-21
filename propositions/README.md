@@ -24,8 +24,9 @@ docs/
     └── assets/apercus/   captures utilisées par la page de comparaison
 ```
 
-Chaque direction est autonome : `index.html`, `assets/css/style.css`, `assets/js/main.js`,
-`assets/img/favicon.svg`. Rien n'est partagé entre elles, on peut en supprimer deux sans casser la troisième.
+Chaque direction est autonome : `index.html`, `assets/css/style.css`, `assets/js/main.js`, et son
+propre `assets/img/` (le logo et l'icône d'onglet y sont recopiés). Rien n'est partagé entre elles,
+on peut en supprimer deux sans casser la troisième.
 
 ## Les trois partis pris
 
@@ -58,19 +59,17 @@ coupée, les repères numérotés renvoient à la nomenclature.
 ### 3. Nuit — `nuit/`
 
 Le premier métier de CMY, c'est la lumière : la page se voit **de nuit**, à l'heure où une enseigne
-travaille. Les trois lettres du bandeau sont fabriquées comme à l'atelier — profil tracé (`THREE.Shape`),
-extrudé (`ExtrudeGeometry`), face diffusante émissive, puis mise sous tension lettre après lettre.
+travaille. Le bandeau porte l'enseigne de la maison, posée sur son mur et vue depuis la rue : deux
+halos superposés — le chaud des caissons, le froid du rétro-éclairage — la détachent du fond.
 
 - **Palette** : nuit, plus les **deux températures de LED vendues au dépôt** — blanc chaud et blanc froid.
 - **Typographie** : Syne (titres) · Manrope (texte).
 - **Signature** : l'interrupteur jour / nuit. Le visiteur éteint l'enseigne et voit exactement ce que
   ses clients voient à 8 h et à 20 h — la démonstration *est* l'argument de vente.
 
-**Dépendance réseau** : c'est la seule des trois qui en a une. Three.js 0.169 est chargé depuis
-jsDelivr via une carte d'imports (`importmap`), nécessaire parce que les modules d'effets importent
-`three` par son nom. Sans réseau, sans WebGL ou sur un appareil qui ne le supporte pas, la scène
-bascule sur l'enseigne à plat déjà présente dans le HTML : rien ne casse, aucun message d'erreur.
-Le bloom est désactivé sous 700 px de large.
+**Aucune dépendance réseau** : l'allumage est du CSS (`filter: drop-shadow`) piloté par une classe.
+La page fonctionne hors ligne, sur n'importe quel appareil, sans WebGL. Une version antérieure
+extrudait les lettres en 3D avec Three.js chargé depuis un CDN ; le vrai logo l'a remplacée.
 
 ## Règles tenues dans les trois
 

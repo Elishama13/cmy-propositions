@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- élévation cotée : caisson + ligne de cote au minium -->
-  <rect width="32" height="32" fill="#E9ECEE"/>
-  <rect x="5" y="9" width="22" height="12" fill="none" stroke="#161D22" stroke-width="2"/>
-  <rect x="9" y="13" width="5" height="4" fill="#161D22"/>
-  <rect x="18" y="13" width="5" height="4" fill="#161D22"/>
-  <path d="M5 26h22M5 23v6M27 23v6" stroke="#C6482D" stroke-width="1.6" fill="none"/>
-</svg>

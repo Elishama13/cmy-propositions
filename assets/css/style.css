@@ -240,20 +240,9 @@ kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--ink-line);
 .topbar-in{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin);
   height:72px;display:flex;align-items:center;gap:32px;}
 
-.mark{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto;}
-.mark-inks{display:flex;align-items:center;isolation:isolate;}
-.mark-inks i{width:16px;height:16px;border-radius:50%;mix-blend-mode:multiply;}
-.mark-inks i+i{margin-left:-6px;}
-.mark-inks .c{background:var(--cyan);}
-.mark-inks .m{background:var(--magenta);}
-.mark-inks .y{background:var(--yellow);}
-.mark-inks.lg i{width:28px;height:28px;}
-.mark-inks.lg i+i{margin-left:-10px;}
-
-.mark-word{font-size:18px;line-height:16px;font-variation-settings:"wdth" 88,"wght" 800;
-  letter-spacing:.02em;display:flex;flex-direction:column;gap:2px;}
-.mark-sub{font-family:var(--mono);font-size:9px;line-height:8px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--ink-soft);font-variation-settings:normal;}
+.mark{display:flex;align-items:center;text-decoration:none;flex:0 0 auto;}
+/* le logo de la maison : sa hauteur est un multiple de la baseline */
+.mark-img{height:48px;width:auto;display:block;}
 
 .nav{display:flex;gap:24px;margin-left:auto;}
 .nav a{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-decoration:none;
@@ -495,8 +484,7 @@ address{font-style:normal;font-size:15px;line-height:24px;margin-bottom:16px;}
 /* --------------------------------------------------------- 18. PIED */
 .foot{background:var(--paper);border-top:1px solid var(--ink);}
 .foot .wrap{padding-top:64px;padding-bottom:48px;}
-.foot-mark .mark-inks{margin-bottom:16px;}
-.foot-name{font-size:20px;line-height:24px;font-variation-settings:"wdth" 88,"wght" 800;margin-bottom:8px;}
+.foot-logo{height:88px;width:auto;display:block;margin-bottom:16px;}
 .foot-nav{display:flex;flex-direction:column;gap:8px;}
 .foot-nav a,.foot-contact .lnk{font-family:var(--mono);font-size:12px;line-height:16px;
   letter-spacing:.06em;text-decoration:none;color:var(--ink-soft);}
@@ -611,10 +599,9 @@ address{font-style:normal;font-size:15px;line-height:24px;margin-bottom:16px;}
 .btn-wa{--btn-ink-fill:var(--wa-green);}
 
 /* --- Marque : les trois encres perdent le repérage, puis se recalent ----- */
-.mark-inks i{transition:transform .4s cubic-bezier(.16,1,.3,1);}
-.mark:hover .mark-inks .c{transform:translate(-3px,-2px);}
-.mark:hover .mark-inks .m{transform:translate(0,3px);}
-.mark:hover .mark-inks .y{transform:translate(3px,-2px);}
+/* pas d'ombre ni de couleur au survol : seule la densité d'encre varie */
+.mark-img{transition:opacity .3s ease;}
+.mark:hover .mark-img{opacity:.74;}
 
 /* --- Navigation : le filet d'encre se tire sous le lien ----------------- */
 .nav a{position:relative;border-bottom-color:transparent;}

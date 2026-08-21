@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMY Imprimerie Design — les propositions à comparer</title>
+<link rel="icon" href="../assets/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<meta property="og:title" content="CMY Imprimerie Design — les propositions">
+<meta property="og:image" content="https://elishama13.github.io/cmy-propositions/assets/img/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://elishama13.github.io/cmy-propositions/assets/img/og-image.jpg">
 <meta name="description" content="Propositions de site pour CMY Imprimerie Design. Même contenu, plusieurs partis pris visuels.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +28,7 @@
   }
   .wrap{width:min(1240px,100% - 48px);margin:0 auto}
   header{padding:clamp(40px,6vw,78px) 0 clamp(22px,3vw,36px)}
+  header .logo{width:min(260px,64vw);height:auto;margin:0 0 26px}
   h1{margin:0 0 14px;font-size:clamp(29px,4vw,45px);line-height:1.08;letter-spacing:-.03em}
   .sub{font-size:17px;color:var(--ink-2);max-width:64ch}
   .meta{margin:20px 0 0;display:flex;flex-wrap:wrap;gap:8px;padding:0;list-style:none}
@@ -62,6 +69,8 @@
 
 <div class="wrap">
   <header>
+    <img class="logo" src="../assets/img/logo-cmy.png" width="1100" height="630"
+         alt="CMY Imprimerie Design">
     <h1>CMY Imprimerie Design — les propositions</h1>
     <p class="sub">
       Chaque site est complet et contient le même contenu réel : les 16 références du catalogue,
@@ -94,7 +103,7 @@
         <dl>
           <div class="li"><dt>Palette</dt><dd>Composite gris et aluminium brossé. Une seule couleur vive : le jaune d'une LED blanc chaud.</dd></div>
           <div class="li"><dt>Type</dt><dd>Bricolage Grotesque · Instrument Sans</dd></div>
-          <div class="li"><dt>Signature</dt><dd>L'enseigne « CMY » du bandeau s'allume lettre après lettre, dans l'ordre du câblage.</dd></div>
+          <div class="li"><dt>Signature</dt><dd>L'enseigne du bandeau se met sous tension au défilement, comme au test d'allumage de l'atelier.</dd></div>
           <div class="li"><dt>Atout</dt><dd>La plus lisible en diagonale : chaque tuile se comprend seule.</dd></div>
         </dl>
         <p class="go"><a class="btn" href="calepinage/index.html">Ouvrir</a></p>
@@ -122,20 +131,20 @@
     </article>
 
     <article class="card">
-      <a class="shot" href="nuit/index.html"><img src="assets/apercus/nuit.png" alt="Aperçu de la direction Nuit : fond noir et lettres CMY en trois dimensions, allumées comme une enseigne"></a>
+      <a class="shot" href="nuit/index.html"><img src="assets/apercus/nuit.png" alt="Aperçu de la direction Nuit : fond noir et enseigne CMY allumée"></a>
       <div class="body">
         <p class="tag">Direction 3</p>
         <h3>Nuit</h3>
         <p class="idea">
           Leur premier métier, c'est la lumière : la page se voit donc de nuit, à l'heure où une enseigne
-          travaille. Les trois lettres sont fabriquées en 3D comme à l'atelier — profil découpé, extrudé,
-          puis mis sous tension.
+          travaille. Le bandeau porte leur enseigne posée sur son mur, vue depuis la rue, halo chaud des
+          caissons et halo froid du rétro-éclairage.
         </p>
         <dl>
           <div class="li"><dt>Palette</dt><dd>Nuit, plus les deux températures de LED vendues au dépôt : blanc chaud et blanc froid.</dd></div>
           <div class="li"><dt>Type</dt><dd>Syne · Manrope</dd></div>
           <div class="li"><dt>Signature</dt><dd>L'interrupteur jour / nuit : le visiteur éteint l'enseigne et voit la différence.</dd></div>
-          <div class="li"><dt>À savoir</dt><dd>Three.js vient d'un CDN. Sans réseau ni WebGL, l'enseigne s'affiche à plat — rien ne casse.</dd></div>
+          <div class="li"><dt>À savoir</dt><dd>Aucune dépendance : l'allumage est du CSS. La page tourne hors ligne, sur n'importe quel appareil.</dd></div>
         </dl>
         <p class="go"><a class="btn" href="nuit/index.html">Ouvrir</a></p>
       </div>

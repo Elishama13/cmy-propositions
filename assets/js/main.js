@@ -62,7 +62,7 @@
   (function opticalAlign() {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
-    var selector = '.masthead, .shead h2, .numeral, .foot-name';
+    var selector = '.masthead, .shead h2, .numeral';
 
     function align() {
       document.querySelectorAll(selector).forEach(function (el) {

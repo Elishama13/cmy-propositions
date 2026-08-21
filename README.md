@@ -14,7 +14,7 @@ docs/
 ├── index.html              toute la page (une seule page, ancres de section)
 ├── assets/css/style.css    styles — la grille et la palette sont en haut du fichier
 ├── assets/js/main.js       comportements — aucune dépendance
-└── assets/img/favicon.svg  icône d'onglet : les trois encres en surimpression
+└── assets/img/            le logo de l'entreprise, ses recadrages et l'icône d'onglet
 ```
 
 ## Le parti pris

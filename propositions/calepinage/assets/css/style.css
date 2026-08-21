@@ -80,16 +80,10 @@ ul{margin:0;padding:0;list-style:none}
   padding:12px var(--pad);
   min-height:64px;
 }
-.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
-/* la marque est elle-même un calepinage : quatre panneaux, un allumé */
-.logo-panels{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:2px;width:26px;height:26px;flex:0 0 auto}
-.logo-panels i{background:var(--alu);border-radius:1px;transition:background var(--t-mid) var(--ease)}
-.logo-panels i:nth-child(2){background:var(--lumen)}
-.logo:hover .logo-panels i:nth-child(1),
-.logo:hover .logo-panels i:nth-child(4){background:var(--lumen)}
-.logo-panels.lg{width:44px;height:44px;gap:3px}
-.logo-txt{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.03em;line-height:1}
-.logo-txt em{display:block;font-family:var(--f-body);font-style:normal;font-weight:500;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin-top:3px}
+.logo{display:flex;align-items:center;text-decoration:none;flex:0 0 auto}
+/* le logo est un panneau de plus dans le calepinage : arête presque vive */
+.logo-img{height:46px;width:auto;display:block;border-radius:var(--radius)}
+.foot-logo{width:min(230px,100%);height:auto;display:block;border-radius:var(--radius);margin-bottom:14px}
 
 .nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav a{
@@ -187,15 +181,13 @@ h3{font-size:clamp(18px,1.4vw,22px);font-weight:600;letter-spacing:-.02em}
   flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,22px);
   position:relative;
 }
-/* chaque lettre est un caisson : corps sombre, face diffusante */
-.sign-letter{
-  font-family:var(--f-display);font-weight:800;
-  font-size:clamp(56px,8.4vw,124px);line-height:.86;letter-spacing:-.04em;
-  color:#6B4B00;
-  padding:.06em .1em .1em;
-  background:rgba(20,24,28,.10);
+/* l'enseigne de la maison, faces diffusantes éteintes tant que le courant
+   n'est pas mis : le composite reste terne, sans lumière propre */
+.sign-logo{
+  width:min(100%,420px);height:auto;position:relative;z-index:1;
   border-radius:var(--radius);
-  transition:background var(--t-mid) var(--ease),color var(--t-mid) var(--ease);
+  filter:brightness(.82) saturate(.72) contrast(.94);
+  transition:filter 620ms var(--ease);
 }
 .sign-glow{
   position:absolute;inset:14% 6%;
@@ -203,9 +195,9 @@ h3{font-size:clamp(18px,1.4vw,22px);font-weight:600;letter-spacing:-.02em}
   opacity:0;pointer-events:none;
   transition:opacity 600ms var(--ease);
 }
-/* allumage séquentiel — l'ordre du câblage, une lettre après l'autre */
-.t-sign.lit .sign-letter{background:#FFF3CE;color:#8A6200;transition-delay:calc(var(--n) * 260ms)}
-.t-sign.lit .sign-glow{opacity:.5;transition-delay:640ms}
+/* mise sous tension : les faces montent en lumière, puis le halo suit */
+.t-sign.lit .sign-logo{filter:brightness(1.06) saturate(1.04) contrast(1)}
+.t-sign.lit .sign-glow{opacity:.5;transition-delay:420ms}
 
 /* ---------- 08. STATISTIQUES ---------- */
 .stat{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,4.4vw,62px);line-height:.9;letter-spacing:-.04em}
@@ -376,7 +368,6 @@ address{font-style:normal;font-size:15px;line-height:1.6}
 
 /* ---------- 16. PIED ---------- */
 .foot{padding-bottom:var(--joint-w)}
-.foot-name{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.03em;color:var(--ink-inv)}
 .foot-nav{display:flex;flex-direction:column;gap:7px}
 .foot-nav a{font-size:14px;color:var(--ink-inv-soft);text-decoration:none;width:fit-content}
 .foot-nav a:hover{color:var(--lumen)}

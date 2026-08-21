@@ -76,10 +76,13 @@ h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:700;line-height:1;tex
   padding:0 var(--gut) 0 calc(var(--marge) + var(--gut));
   min-height:60px;max-width:1600px;margin:0 auto;
 }
-.logo{display:flex;align-items:center;gap:11px;text-decoration:none;flex:0 0 auto}
-.logo-fig{width:34px;color:var(--ink);flex:0 0 auto}
-.logo-txt{font-family:var(--f-display);font-weight:700;font-size:21px;text-transform:uppercase;line-height:1}
-.logo-txt em{display:block;font-family:var(--f-mono);font-style:normal;font-size:9.5px;letter-spacing:.1em;color:var(--ink-2);margin-top:2px;text-transform:uppercase}
+.logo{display:flex;align-items:center;text-decoration:none;flex:0 0 auto}
+/* Le logo est une vignette collée sur le tirage : un filet la borde,
+   comme toute pièce rapportée sur un plan. */
+.logo-img{height:46px;width:auto;display:block;padding:3px 5px;background:var(--paper-2);border:1px solid var(--line)}
+.logo:hover .logo-img{border-color:var(--minium)}
+/* dans le cartouche, la vignette prend la place du nom du maître d'œuvre */
+.cart-logo{width:min(210px,100%);height:auto;padding:5px 7px;background:#fff;border:1px solid var(--ink-3);margin:2px 0 3px}
 
 .nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
 .nav a{

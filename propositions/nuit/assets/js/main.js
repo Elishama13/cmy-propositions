@@ -1,7 +1,7 @@
 /* ============================================================
    CMY IMPRIMERIE DESIGN — direction « NUIT »
-   Comportements de la page. La scène 3D vit dans scene.js et
-   n'est pas nécessaire au fonctionnement de ce fichier.
+   Comportements de la page, y compris l'interrupteur de l'enseigne
+   du héros. Aucune dépendance : la page fonctionne hors ligne.
    ============================================================ */
 (function () {
   'use strict';
@@ -178,7 +178,47 @@
     sections.forEach(function (s) { spy.observe(s); });
   }
 
-  /* ---------- 7. Année ---------- */
+  /* ---------- 7. Interrupteur de l'enseigne ----------
+     L'enseigne du héros s'allume et s'éteint comme au dépôt, avant la
+     pose : c'est le test de mise sous tension. L'allumage se fait à
+     l'entrée dans le champ, puis le bouton reprend la main. */
+  var stage = document.getElementById('stage');
+  var switchBtn = document.getElementById('lightSwitch');
+  var switchLabel = document.getElementById('switchLabel');
+  var ctrlNote = document.getElementById('ctrlNote');
+
+  if (stage && switchBtn) {
+    var lit = true;
+
+    var poser = function (next) {
+      lit = next;
+      stage.classList.toggle('off', !lit);
+      switchBtn.setAttribute('aria-pressed', String(lit));
+      if (switchLabel) {
+        switchLabel.textContent = lit ? 'Enseigne allumée' : 'Enseigne éteinte';
+      }
+      if (ctrlNote) {
+        ctrlNote.textContent = lit
+          ? 'Coupez le courant pour voir ce que vos clients voient le jour.'
+          : 'Rallumez : c\u2019est ce que voient vos clients après 18 h.';
+      }
+    };
+
+    switchBtn.addEventListener('click', function () { poser(!lit); });
+
+    /* mise sous tension progressive, sauf si l'on préfère le mouvement réduit */
+    if (!reduced && 'IntersectionObserver' in window) {
+      stage.classList.add('off');
+      var mise = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) { return; }
+        window.setTimeout(function () { stage.classList.remove('off'); }, 420);
+        mise.disconnect();
+      }, { threshold: 0.35 });
+      mise.observe(stage);
+    }
+  }
+
+  /* ---------- 8. Année ---------- */
   var year = document.getElementById('year');
   if (year) { year.textContent = String(new Date().getFullYear()); }
 })();

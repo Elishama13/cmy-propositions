@@ -147,17 +147,17 @@ h3{
 .barre-in{max-width:var(--cadre);margin:0 auto;padding:0 var(--marge);
   height:72px;display:flex;align-items:center;gap:28px;}
 
-.logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto;}
-.logo-tube{
-  width:26px;height:10px;border-radius:5px;flex:0 0 auto;
-  background:var(--led-chaud);
-  filter:drop-shadow(0 0 calc(10px * var(--lueur)) var(--led-chaud));
-  transition:filter .6s ease,background-color .6s ease;
+.logo{display:flex;align-items:center;text-decoration:none;flex:0 0 auto;}
+/* Le logo de la maison suit les deux vies de la page : la nuit il rayonne
+   comme une enseigne sous tension, le jour un filet d'ombre le détache
+   du béton clair. --lueur vaut 1 la nuit, 0 le jour. */
+.logo-img{
+  height:44px;width:auto;display:block;
+  filter:drop-shadow(0 0 calc(16px * var(--lueur)) var(--led-chaud));
+  transition:filter .6s ease;
 }
-.logo-txt{font-family:var(--disp);font-weight:800;font-size:26px;line-height:.8;
-  letter-spacing:.01em;text-transform:uppercase;display:flex;flex-direction:column;gap:3px;}
-.logo-txt em{font-family:var(--mono);font-style:normal;font-size:9px;letter-spacing:.2em;
-  color:var(--txt-2);text-transform:uppercase;font-weight:400;}
+:root[data-mode="jour"] .logo-img{filter:drop-shadow(0 1px 2px rgba(0,0,0,.22));}
+.pied .logo-img{height:76px;}
 
 .nav{display:flex;gap:26px;margin-left:auto;}
 .nav a{font-size:14px;text-decoration:none;color:var(--txt-2);padding:6px 0;

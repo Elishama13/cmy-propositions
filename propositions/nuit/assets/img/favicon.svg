@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- vue de nuit : trois modules allumés, deux températures de LED -->
-  <rect width="32" height="32" fill="#0A0C10"/>
-  <circle cx="16" cy="16" r="11" fill="#FFC978" opacity=".14"/>
-  <rect x="5"  y="11" width="6" height="10" rx="1" fill="#FFC978"/>
-  <rect x="13" y="11" width="6" height="10" rx="1" fill="#FFD79A"/>
-  <rect x="21" y="11" width="6" height="10" rx="1" fill="#7FD4F5"/>
-</svg>

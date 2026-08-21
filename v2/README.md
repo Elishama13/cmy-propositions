@@ -35,7 +35,7 @@ docs/v2/
 ├── index.html              toute la page
 ├── assets/css/style.css    styles — les deux modes sont en haut du fichier
 ├── assets/js/main.js       comportements — aucune dépendance
-└── assets/img/favicon.svg  un tube allumé
+└── assets/img/            le logo de l'entreprise et l'icône d'onglet
 ```
 
 ## Les deux modes
