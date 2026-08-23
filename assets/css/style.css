@@ -173,14 +173,7 @@ ul{margin:0;padding:0;list-style:none}
 .t-mag .tile-k,.t-mag .tile-cap,.t-mag .desc,.t-mag p{color:rgba(255,255,255,.86)}
 .t-mag h2,.t-mag h3,.t-mag .stat{color:#fff}
 
-/* la devise : un aplat d'encre magenta et une seule phrase, à la façon d'un
-   bandeau d'enseigne. Blanc sur magenta — le noir n'y passerait pas (3,4:1). */
-.t-slogan{gap:16px;padding-block:clamp(30px,3.6vw,52px)}
-.slogan{
-  font-family:var(--f-display);font-weight:800;
-  font-size:clamp(24px,3.1vw,44px);line-height:1.06;letter-spacing:-.03em;
-  color:#fff;max-width:26ch;
-}
+/* la devise ouvre la page en h1 ; au pied elle revient en petit, sur l'encre lumen */
 /* la spécificité doit dépasser celle de « .t-dark p », sinon la devise
    retombe dans le gris de texte courant du panneau sombre */
 .t-dark .foot-slogan{

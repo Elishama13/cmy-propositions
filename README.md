@@ -41,11 +41,12 @@ assets/img/             le logo de l'entreprise, ses recadrages et l'icône d'on
 
 ## La devise
 
-> **Pour vous nous avons des couleurs naturelles**
+> **Pour vous, nous avons des couleurs naturelles**
 
 Donnée officielle de l'entreprise, à reproduire telle quelle. Elle paraît à quatre endroits qui
-doivent rester d'accord : le bandeau magenta de `#presentation`, le pied de page sous le logo,
-la propriété `slogan` du JSON-LD, et la balise `og:description`.
+doivent rester d'accord : le **`<h1>` de la page**, le pied de page sous le logo, la propriété
+`slogan` du JSON-LD, et la balise `og:description`. La virgule après « Pour vous » a été ajoutée
+à la demande du client ; le libellé ne porte pas de point final.
 
 ## Le parti pris
 
