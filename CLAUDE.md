@@ -31,11 +31,31 @@ Le nom du dépôt (`cmy-propositions`) et l'URL Pages sont ceux de cette périod
 des balises `og:image`, `twitter:image` et du JSON-LD pointent vers ce domaine : **les mettre à
 jour ensemble** si un vrai nom de domaine est branché.
 
+## Faux texte : la règle la plus importante de ce dépôt
+
+Le client a transmis un plan de site (`request/`, non versionné — GitHub Pages servirait ces
+documents internes) qui a fait passer le site de 8 à 19 sections. Beaucoup n'ont **aucun contenu
+fourni**. La convention retenue, à tenir absolument :
+
+- **Texte descriptif manquant → lorem ipsum.** Visiblement faux, donc inoffensif.
+- **Donnée factuelle manquante → emplacement « à fournir », jamais une valeur inventée.**
+  Adresse d'Angré, téléphones par direction, noms de l'organigramme, prix, effectif, année de
+  création. Un faux numéro ne se repère pas comme du lorem ipsum et sonnerait chez un tiers.
+- **Ne jamais « compléter » le lorem ipsum** par du texte plausible sur l'entreprise. Le remplacer
+  uniquement par ce que le client a réellement écrit.
+- Le `noindex` (`robots.txt` + balise du `<head>`) reste en place tant qu'il subsiste du faux
+  texte. `grep -c 'Lorem ipsum' index.html` donne l'état d'avancement.
+
+Repères utiles : `class="ph"` marque un emplacement photo, `data-todo="specs"` les matières dont
+les caractéristiques manquent, `.prix-v` la valeur de prix à remplir.
+
 ## Structure
 
 ```
-index.html              page unique, sections ancrées : #haut #poles #catalogue #depot
-                        #atelier #chantiers #devis #contact
+index.html              page unique, 19 sections ancrées : #haut #presentation #poles
+                        #catalogue #imprimerie #decoupe #depot #decoration #import-export
+                        #logistique #atelier #realisations #formation #organigramme
+                        #perspective #detente #devis #localisation #contact
 assets/css/style.css    jetons dans :root en haut du fichier
 assets/js/main.js       IIFE, huit blocs numérotés en commentaire
 assets/img/             logo, recadrage compact, favicons, image de partage
@@ -51,9 +71,27 @@ creux (`--joint-w: 10px`). Ce n'est pas une métaphore décorative : c'est la r�
 arbitrages de mise en page.
 
 Jetons dans `:root` (`assets/css/style.css`) : `--joint` / `--joint-2` (l'ossature),
-`--panel` / `--panel-2` (le composite), `--alu` (aluminium brossé), `--lumen` / `--lumen-deep`
-(la LED blanc chaud — **la seule couleur vive de la page**, à ne pas multiplier), `--radius: 3px`
+`--panel` / `--panel-2` (le composite), `--alu` (aluminium brossé), `--radius: 3px`
 (tôle pliée, pas plastique — ne pas arrondir davantage).
+
+## Les couleurs : celles du logo, et leur règle de contraste
+
+Relevées sur `assets/img/logo-cmy.png` : `--magenta` #CF1B7E (accent de l'interface),
+`--cyan` #289AD3 (pôle impression), `--jaune` #FDD305 (pôle dépôt). `--lumen` #FFC22E reste
+distinct : c'est la *lumière* de l'enseigne qui s'allume, pas une couleur d'interface.
+
+Ces trois encres n'ont pas la même densité, et c'est ce qui décide de leur emploi :
+
+| Support | Ce qui porte le texte | Interdit |
+| --- | --- | --- |
+| composite clair | `--magenta` (5,1:1), `--cyan-ink` (4,6:1) | `--cyan` brut (3,1:1), tout jaune (1,5:1) |
+| panneau sombre | `--lumen` (9,7:1) | `--magenta` (3,1:1) |
+| aplat `.t-mag` | blanc (5,1:1) | noir |
+| aplat `.t-cyan` | noir (5,5:1) | blanc |
+| aplat `.t-lum` | noir (14,5:1) | blanc |
+
+En clair : **sur fond clair, l'accent est le magenta ; sur fond sombre, c'est le jaune `--lumen`.**
+`--cyan-ink` est la seule forme du cyan autorisée à porter du texte. Aucun texte jaune, nulle part.
 
 ## Règles de fabrication
 
@@ -82,6 +120,8 @@ Ce sont des contraintes assumées, pas des oublis. Les tenir dans tout ajout :
 | Horaires | la table `#hoursTable` **et** l'objet `HOURS` de `main.js` (minutes depuis minuit) — c'est lui qui calcule « ouvert / fermé » |
 | Adresse, GPS, raison sociale | le corps de `index.html` **et** le bloc `<script type="application/ld+json">` du `<head>` |
 | Catalogue | les `data-cat` des `<article class="t-item">`, les compteurs `<span>` des boutons `.filter` (**écrits en dur**, le script ne les recalcule pas, « Tout » compris) et le `<select>` du devis |
+| Dépôt | 18 références MP-01 → MP-18 ; le compteur `18` de l'accueil et le `<optgroup>` Dépôt du devis suivent |
+| Navigation | la barre du haut ne porte que 7 entrées ; **le pied de page les liste toutes les 18** — y ajouter toute section nouvelle |
 
 Catégories valides : `enseignes`, `totems`, `facade`, `impression`, `signaletique`.
 
@@ -89,6 +129,13 @@ Catégories valides : `enseignes`, `totems`, `facade`, `impression`, `signaletiq
 l'Europe, le statut « ouvert / fermé » est décalé d'une à deux heures. La Côte d'Ivoire étant à
 UTC+0 toute l'année, la correction consiste à passer aux getters UTC (`getUTCDay`, `getUTCHours`,
 `getUTCMinutes`). Non corrigé à ce jour.
+
+## Recherche et filtres : un seul état
+
+`main.js` §4 tient `categorie` et `terme` dans une unique fonction `appliquer()`. Ne pas ajouter un
+second mécanisme de filtrage en parallèle : les deux commandes se déferaient l'une l'autre. La
+comparaison passe par `pliable()` (minuscules + accents retirés). Le champ de recherche est
+**créé par le script** et n'existe pas dans le HTML — sans JavaScript, ce serait une commande morte.
 
 ## Le formulaire de devis
 

@@ -1,3 +1,8 @@
 .DS_Store
 .idea/
 token.txt
+
+# documents de travail transmis par le client (plan de site, photos WhatsApp).
+# GitHub Pages sert tout le dépôt : les versionner les rendrait publiquement
+# téléchargeables. Ils restent en local.
+request/

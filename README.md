@@ -17,6 +17,19 @@ git checkout propositions-v1     # les cinq versions côte à côte
 git checkout main                # revenir au site
 ```
 
+## État : maquette d'arborescence, pas encore un site publiable
+
+Le client a transmis un plan de site (`request/SITE INTERNET.pdf`, non versionné) qui élargit
+beaucoup le périmètre. **Les dix-neuf sections demandées existent**, mais celles dont il n'a pas
+fourni le contenu portent du **lorem ipsum**. Deux règles ont été tenues :
+
+- un **texte** manquant est du lorem ipsum — visiblement faux, donc sans danger ;
+- une **donnée** manquante (adresse d'Angré, téléphones par direction, noms de l'organigramme,
+  prix, effectif, année de création) reste un emplacement marqué « à fournir ». Un faux numéro
+  ou une fausse adresse ne se repère pas comme du lorem ipsum et sonnerait chez quelqu'un.
+
+Conséquence : **le site reste en `noindex`** jusqu'au remplacement complet du faux texte.
+
 ## Fichiers
 
 ```
@@ -33,8 +46,9 @@ séparés par un joint creux de 10 mm qui laisse voir l'ossature sombre. La page
 ainsi — le fond sombre *est* le joint, chaque bloc *est* un panneau, la gouttière de la grille
 *est* le joint creux (`--joint-w: 10px`).
 
-- **Palette** : composite gris, aluminium brossé, et une seule couleur vive — le jaune d'une LED
-  blanc chaud (`--lumen`).
+- **Palette** : composite gris et aluminium brossé, plus les **trois encres du logo** — magenta
+  `#CF1B7E`, cyan `#289AD3`, jaune `#FDD305`. Le magenta est l'accent de l'interface ; le cyan
+  identifie l'impression, le jaune le dépôt. Le jaune `--lumen` reste réservé à la lumière.
 - **Typographie** : Bricolage Grotesque (titres) · Instrument Sans (texte), chargées depuis Google
   Fonts, avec repli sur les grotesques du système.
 - **Signature** : l'enseigne « CMY » du bandeau s'allume lettre après lettre, dans l'ordre du
@@ -62,6 +76,8 @@ ainsi — le fond sombre *est* le joint, chaque bloc *est* un panneau, la goutti
 | Horaires | table `#hoursTable` dans `index.html` **et** l'objet `HOURS` dans `main.js` (les deux doivent rester d'accord — c'est lui qui calcule « ouvert / fermé ») |
 | Lien Facebook | `index.html`, chercher `facebook.com` |
 | Couleurs, joint, rayons, polices | bloc `:root` en haut de `style.css` |
+| Prix d'une pièce | le `<span class="prix-v">` de la vignette : remplacer « Sur devis » par le tarif |
+| Faux texte restant | chercher `Lorem ipsum` dans `index.html` |
 | Image de partage (Facebook, WhatsApp) | `assets/img/og-image.jpg` — les balises `og:image` pointent vers l'URL GitHub Pages, à changer si le domaine change |
 
 ## Ajouter une référence au catalogue
@@ -72,6 +88,31 @@ disponibles sont `enseignes`, `totems`, `facade`, `impression`, `signaletique`. 
 1. mettre à jour le compteur du filtre correspondant (`<button class="filter"><span>`) **et** celui
    de « Tout » — ils sont écrits en dur, le script ne les recalcule pas ;
 2. ajouter la référence dans le `<select>` du formulaire de devis, sous le bon `<optgroup>`.
+
+## Contraste : la règle à ne pas enfreindre
+
+Les trois encres n'ont pas la même densité. Vérifié au ratio WCAG AA :
+
+| Usage | Ce qui passe | Ce qui ne passe pas |
+| --- | --- | --- |
+| Texte sur composite clair | magenta — 5,1:1 | cyan (3,1:1), jaune (1,5:1) |
+| Texte sur panneau sombre | `--lumen` — 9,7:1 | magenta (3,1:1) |
+| Texte sur aplat magenta | blanc — 5,1:1 | noir (3,4:1) |
+| Texte sur aplat cyan | noir — 5,5:1 | blanc (3,1:1) |
+| Texte sur aplat jaune | noir — 14,5:1 | blanc |
+
+D'où `--cyan-ink` (#1C7CB0, 4,6:1) : la seule forme du cyan autorisée à porter du texte sur fond
+clair. **Aucun texte jaune nulle part.**
+
+## La barre de recherche
+
+Elle filtre en même temps les pièces du catalogue et les matières du dépôt, sans accents ni casse
+(« bache » trouve « Bâche »), annonce le nombre de résultats en `aria-live`, et se vide avec `Échap`.
+
+Elle est **créée par le script**, jamais présente dans le HTML : sans JavaScript, un champ qui ne
+filtrerait rien serait une commande morte. Le reste de la page, lui, est complet sans script.
+Recherche et filtres par catégorie passent par la même fonction `appliquer()` dans `main.js` §4 —
+saisir un terme rouvre le catalogue en grand, sinon la catégorie active masquerait les résultats.
 
 ## Le formulaire de devis
 
@@ -101,6 +142,14 @@ pour le métier mais ne figurent pas sur la fiche source :
 - le délai « maquette à J+1 » et le déroulé des étapes ;
 - l'absence d'adresse e-mail : aucune n'est publiée, tous les contacts passent par téléphone ou
   WhatsApp.
+
+### Ce que le client doit encore fournir
+
+Grille tarifaire · adresse, GPS et horaires du site d'Angré · noms et postes de l'organigramme ·
+téléphones par direction · effectif et année de création · contenu réel d'Import-Export, Décoration
+et Perspectives · caractéristiques des matières MP-07 à MP-18 · ce que recouvre « Section découpe »
+(le plan de site y recopie la liste de l'imprimerie) · ce que désigne « Palette » dans Produits et
+prix · les photos : devanture, équipe, machines, écran géant, site d'Angré, magasin, sorties.
 
 Aucune date de création, aucun chiffre d'affaires, aucun nom de client, aucune photo de réalisation
 n'a été inventé.

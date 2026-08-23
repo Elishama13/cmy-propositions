@@ -56,25 +56,133 @@
     }
   }
 
-  /* ---------- 4. Filtre du catalogue ---------- */
+  /* ---------- 4. Filtre du catalogue + recherche ----------
+     Un seul état, deux commandes : les boutons de catégorie ne portent que sur le
+     catalogue, le champ de recherche porte aussi sur le dépôt. Tout passe par
+     appliquer(), pour qu'aucune des deux ne défasse le travail de l'autre. */
   var filters = Array.prototype.slice.call(document.querySelectorAll('.filter'));
   var items = Array.prototype.slice.call(document.querySelectorAll('.t-item'));
+  var mats = Array.prototype.slice.call(document.querySelectorAll('.t-mat'));
   var empty = document.getElementById('catEmpty');
+  var emptyMat = document.getElementById('depotEmpty');
+
+  var categorie = 'tout';
+  var terme = '';
+
+  /* « Bâche » doit répondre à « bache » : on compare sans accents ni casse */
+  function pliable(txt) {
+    return txt.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  /* le texte d'une vignette ne change jamais : on ne le relit qu'une fois */
+  function texteDe(el) {
+    if (!el.dataset.recherche) {
+      el.dataset.recherche = pliable(el.textContent.replace(/\s+/g, ' ').trim());
+    }
+    return el.dataset.recherche;
+  }
+
+  function appliquer() {
+    var vus = 0;
+
+    var visiblesCat = 0;
+    items.forEach(function (item) {
+      var okCat = categorie === 'tout' || item.dataset.cat === categorie;
+      var okTerme = !terme || texteDe(item).indexOf(terme) !== -1;
+      var montre = okCat && okTerme;
+      item.hidden = !montre;
+      if (montre) { visiblesCat++; }
+    });
+    if (empty) { empty.hidden = visiblesCat !== 0; }
+    vus += visiblesCat;
+
+    var visiblesMat = 0;
+    mats.forEach(function (mat) {
+      var montre = !terme || texteDe(mat).indexOf(terme) !== -1;
+      mat.hidden = !montre;
+      if (montre) { visiblesMat++; }
+    });
+    if (emptyMat) { emptyMat.hidden = visiblesMat !== 0; }
+    vus += visiblesMat;
+
+    return vus;
+  }
 
   filters.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var cat = btn.dataset.cat;
+      categorie = btn.dataset.cat;
       filters.forEach(function (b) { b.classList.toggle('is-on', b === btn); });
-
-      var shown = 0;
-      items.forEach(function (item) {
-        var match = cat === 'tout' || item.dataset.cat === cat;
-        item.hidden = !match;
-        if (match) { shown++; }
-      });
-      if (empty) { empty.hidden = shown !== 0; }
+      appliquer();
     });
   });
+
+  /* ---------- 4 bis. La barre de recherche ----------
+     Elle n'existe que si le script tourne : sans JavaScript, une commande qui ne
+     filtre rien serait un bouton mort. Le reste de la page, lui, est déjà complet. */
+  (function recherche() {
+    var barIn = document.querySelector('.bar-in');
+    var cta = document.querySelector('.bar-cta');
+    if (!barIn || (!items.length && !mats.length)) { return; }
+
+    var form = document.createElement('form');
+    form.className = 'search';
+    form.setAttribute('role', 'search');
+    form.addEventListener('submit', function (e) { e.preventDefault(); });
+
+    var label = document.createElement('label');
+    label.className = 'sr-only';
+    label.setAttribute('for', 'q');
+    label.textContent = 'Rechercher une pièce ou une matière';
+
+    var champ = document.createElement('input');
+    champ.type = 'search';
+    champ.id = 'q';
+    champ.className = 'search-in';
+    champ.placeholder = 'Rechercher…';
+    champ.autocomplete = 'off';
+
+    var compte = document.createElement('p');
+    compte.className = 'search-n';
+    compte.setAttribute('aria-live', 'polite');
+
+    form.appendChild(label);
+    form.appendChild(champ);
+    form.appendChild(compte);
+    barIn.insertBefore(form, cta || null);
+
+    var minuteur;
+    champ.addEventListener('input', function () {
+      window.clearTimeout(minuteur);
+      minuteur = window.setTimeout(function () {
+        terme = pliable(champ.value.trim());
+
+        /* une recherche qui garderait une catégorie active ne trouverait rien :
+           on rouvre le catalogue en grand dès qu'un terme est saisi */
+        if (terme && categorie !== 'tout') {
+          categorie = 'tout';
+          filters.forEach(function (b) { b.classList.toggle('is-on', b.dataset.cat === 'tout'); });
+        }
+
+        var n = appliquer();
+        form.classList.toggle('is-on', !!terme);
+        if (!terme) { compte.textContent = ''; return; }
+        compte.textContent = n === 0 ? 'aucun résultat'
+                           : n === 1 ? '1 résultat'
+                           : n + ' résultats';
+      }, 140);
+    });
+
+    champ.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && champ.value) {
+        e.preventDefault();
+        champ.value = '';
+        terme = '';
+        appliquer();
+        form.classList.remove('is-on');
+        compte.textContent = '';
+      }
+    });
+  })();
 
   /* ---------- 5. Horaires : ouvert ou fermé, maintenant ---------- */
   var HOURS = {
