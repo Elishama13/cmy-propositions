@@ -39,6 +39,14 @@ assets/js/main.js       comportements — aucune dépendance
 assets/img/             le logo de l'entreprise, ses recadrages et l'icône d'onglet
 ```
 
+## La devise
+
+> **Pour vous nous avons des couleurs naturelles**
+
+Donnée officielle de l'entreprise, à reproduire telle quelle. Elle paraît à quatre endroits qui
+doivent rester d'accord : le bandeau magenta de `#presentation`, le pied de page sous le logo,
+la propriété `slogan` du JSON-LD, et la balise `og:description`.
+
 ## Le parti pris
 
 Un bardage de façade en alucobond est un **calepinage** : des panneaux de tailles différentes,

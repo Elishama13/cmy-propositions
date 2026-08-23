@@ -173,6 +173,21 @@ ul{margin:0;padding:0;list-style:none}
 .t-mag .tile-k,.t-mag .tile-cap,.t-mag .desc,.t-mag p{color:rgba(255,255,255,.86)}
 .t-mag h2,.t-mag h3,.t-mag .stat{color:#fff}
 
+/* la devise : un aplat d'encre magenta et une seule phrase, à la façon d'un
+   bandeau d'enseigne. Blanc sur magenta — le noir n'y passerait pas (3,4:1). */
+.t-slogan{gap:16px;padding-block:clamp(30px,3.6vw,52px)}
+.slogan{
+  font-family:var(--f-display);font-weight:800;
+  font-size:clamp(24px,3.1vw,44px);line-height:1.06;letter-spacing:-.03em;
+  color:#fff;max-width:26ch;
+}
+/* la spécificité doit dépasser celle de « .t-dark p », sinon la devise
+   retombe dans le gris de texte courant du panneau sombre */
+.t-dark .foot-slogan{
+  font-family:var(--f-display);font-weight:600;font-size:16.5px;line-height:1.25;
+  letter-spacing:-.02em;color:var(--lumen);max-width:24ch;margin-bottom:10px;
+}
+
 /* ---------- 05. TYPOGRAPHIE DE PANNEAU ---------- */
 .eyebrow{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
 .led{width:9px;height:9px;border-radius:50%;background:var(--lumen);flex:0 0 auto}

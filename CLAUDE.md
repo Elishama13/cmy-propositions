@@ -116,6 +116,7 @@ Ce sont des contraintes assumées, pas des oublis. Les tenir dans tout ajout :
 
 | Donnée | Emplacements |
 | --- | --- |
+| Devise « Pour vous nous avons des couleurs naturelles » | le bandeau de `#presentation`, le pied de page, la propriété `slogan` du JSON-LD et `og:description` — **libellé officiel, à ne pas reformuler ni reponctuer** |
 | Numéro WhatsApp `2250789736267` | `index.html` (liens `wa.me` et `tel:`) **et** la constante `TEL` en tête de `main.js` |
 | Horaires | la table `#hoursTable` **et** l'objet `HOURS` de `main.js` (minutes depuis minuit) — c'est lui qui calcule « ouvert / fermé » |
 | Adresse, GPS, raison sociale | le corps de `index.html` **et** le bloc `<script type="application/ld+json">` du `<head>` |
