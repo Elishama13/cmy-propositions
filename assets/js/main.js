@@ -1,115 +1,65 @@
-/* =============================================================================
-   CMY IMPRIMERIE DESIGN — comportements de page
-   Aucune dépendance. Tout est progressif : sans JS, la page reste lisible et
-   le catalogue affiche l'intégralité des références.
-   ============================================================================= */
+/* ============================================================
+   CMY IMPRIMERIE DESIGN — direction « CALEPINAGE »
+   Aucune dépendance. Tout le contenu existe sans JavaScript :
+   le script n'ajoute que des comportements.
+   ============================================================ */
 (function () {
   'use strict';
 
-  var WA_NUMBER = '2250789736267';
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* Marque la page comme scriptée : c'est cette classe qui autorise le CSS à
-     masquer les éléments animés. Sans JS, rien n'est caché. */
   document.documentElement.classList.add('js');
 
-  /* ------------------------------------------------ 1. CALQUE DE GRILLE */
-  /* Le calque lit les mêmes variables CSS que le contenu : ses colonnes sont
-     exactement les colonnes du contenu, à toutes les largeurs. */
-  var cols = parseInt(
-    getComputedStyle(document.documentElement).getPropertyValue('--cols').trim() || '12', 10);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TEL = '2250789736267';
 
-  document.querySelectorAll('.guides .cols').forEach(function (host) {
-    for (var i = 1; i <= cols; i++) {
-      var col = document.createElement('div');
-      col.className = 'col';
-      var n = document.createElement('span');
-      n.textContent = i;
-      col.appendChild(n);
-      host.appendChild(col);
-    }
-  });
-
-  var gridBtn = document.getElementById('gridToggle');
-
-  function setGrid(on) {
-    document.body.classList.toggle('grid-on', on);
-    if (!gridBtn) return;
-    gridBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    var label = gridBtn.querySelector('.lbl');
-    if (label) label.textContent = on ? 'Masquer la grille' : 'Voir la grille';
-  }
-
-  if (gridBtn) {
-    gridBtn.addEventListener('click', function () {
-      setGrid(!document.body.classList.contains('grid-on'));
-    });
-  }
-
-  document.addEventListener('keydown', function (e) {
-    if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      var t = e.target;
-      if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
-      setGrid(!document.body.classList.contains('grid-on'));
-    }
-  });
-
-  /* ------------------------------------------- 2. ALIGNEMENT OPTIQUE */
-  /* Un titre de 120 px dont la BOÎTE est sur la ligne de colonne paraît
-     toujours décalé : l'encre du glyphe est en retrait de son approche
-     gauche. On mesure ce retrait sur la police réellement chargée et on
-     décale la boîte pour que l'ENCRE tombe sur la ligne. */
-  (function opticalAlign() {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var selector = '.masthead, .shead h2, .numeral';
-
-    function align() {
-      document.querySelectorAll(selector).forEach(function (el) {
-        el.style.marginLeft = '0px';
-        var cs = getComputedStyle(el);
-        var ch = (el.textContent || '').trim().charAt(0);
-        if (!ch) return;
-        if (cs.textTransform === 'uppercase') ch = ch.toUpperCase();
-        ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-        ctx.textAlign = 'left';
-        var abl = ctx.measureText(ch).actualBoundingBoxLeft;
-        if (isFinite(abl)) el.style.marginLeft = abl.toFixed(2) + 'px';
-      });
-    }
-
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(align);
-    align();
-
-    var t;
-    window.addEventListener('resize', function () {
-      clearTimeout(t);
-      t = setTimeout(align, 120);
-    });
-  })();
-
-  /* --------------------------------------------------- 3. MENU MOBILE */
+  /* ---------- 1. Menu mobile ---------- */
   var burger = document.getElementById('burger');
-  var topbar = document.getElementById('topbar');
-
-  if (burger && topbar) {
+  var nav = document.getElementById('nav');
+  if (burger && nav) {
     burger.addEventListener('click', function () {
-      var open = topbar.classList.toggle('is-open');
-      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var open = nav.classList.toggle('open');
+      burger.setAttribute('aria-expanded', String(open));
       burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
     });
-    topbar.querySelectorAll('.nav a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        topbar.classList.remove('is-open');
+    nav.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') {
+        nav.classList.remove('open');
         burger.setAttribute('aria-expanded', 'false');
-      });
+      }
     });
   }
 
-  /* ----------------------------------------------- 4. FILTRES CATALOGUE */
-  var filters = document.querySelectorAll('.filter');
-  var items = document.querySelectorAll('#catalogue-liste .item');
-  var emptyMsg = document.getElementById('catalogue-vide');
+  /* ---------- 2. Pose des panneaux au défilement ---------- */
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('.tile'));
+  tiles.forEach(function (t, i) { t.style.setProperty('--i', i % 8); });
+
+  if (reduced || !('IntersectionObserver' in window)) {
+    tiles.forEach(function (t) { t.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    tiles.forEach(function (t) { io.observe(t); });
+  }
+
+  /* ---------- 3. L'enseigne s'allume ---------- */
+  var sign = document.querySelector('.t-sign');
+  if (sign) {
+    if (reduced) {
+      sign.classList.add('lit');
+    } else {
+      window.setTimeout(function () { sign.classList.add('lit'); }, 520);
+    }
+  }
+
+  /* ---------- 4. Filtre du catalogue ---------- */
+  var filters = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('.t-item'));
+  var empty = document.getElementById('catEmpty');
 
   filters.forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -119,16 +69,67 @@
       var shown = 0;
       items.forEach(function (item) {
         var match = cat === 'tout' || item.dataset.cat === cat;
-        item.classList.toggle('is-out', !match);
-        if (match) shown++;
+        item.hidden = !match;
+        if (match) { shown++; }
       });
-      if (emptyMsg) emptyMsg.hidden = shown !== 0;
+      if (empty) { empty.hidden = shown !== 0; }
     });
   });
 
-  /* ------------------------------------------- 5. DEVIS → WHATSAPP */
-  /* Le formulaire ne poste rien : il compose un message et l'ouvre dans
-     WhatsApp, où le client relit avant d'envoyer. Aucune donnée stockée. */
+  /* ---------- 5. Horaires : ouvert ou fermé, maintenant ---------- */
+  var HOURS = {
+    1: [480, 1020], 2: [480, 1020], 3: [480, 1020], 4: [480, 1020], 5: [480, 1020],
+    6: [540, 780], 0: null
+  };
+  var DAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+  function hhmm(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  function nextOpening(day) {
+    for (var step = 1; step <= 7; step++) {
+      var d = (day + step) % 7;
+      if (HOURS[d]) {
+        return (step === 1 ? 'demain' : DAYS[d]) + ' à ' + hhmm(HOURS[d][0]);
+      }
+    }
+    return '';
+  }
+
+  function refreshStatus() {
+    var now = new Date();
+    var day = now.getDay();
+    var mins = now.getHours() * 60 + now.getMinutes();
+    var slot = HOURS[day];
+    var open = !!slot && mins >= slot[0] && mins < slot[1];
+
+    var dot = document.getElementById('statusDot');
+    var text = document.getElementById('statusText');
+    if (dot && text) {
+      dot.classList.toggle('open', open);
+      dot.classList.toggle('closed', !open);
+      if (open) {
+        text.textContent = 'Ouvert — jusqu’à ' + hhmm(slot[1]);
+      } else if (slot && mins < slot[0]) {
+        text.textContent = 'Fermé — ouvre à ' + hhmm(slot[0]);
+      } else {
+        text.textContent = 'Fermé — ouvre ' + nextOpening(day);
+      }
+    }
+
+    var table = document.getElementById('hoursTable');
+    if (table) {
+      Array.prototype.slice.call(table.querySelectorAll('tr')).forEach(function (tr) {
+        tr.classList.toggle('today', Number(tr.dataset.day) === day);
+      });
+    }
+  }
+  refreshStatus();
+  window.setInterval(refreshStatus, 60000);
+
+  /* ---------- 6. Devis : le formulaire prépare le message WhatsApp ---------- */
   var form = document.getElementById('devisForm');
   var hint = document.getElementById('formHint');
 
@@ -136,173 +137,58 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var nom = form.nom.value.trim();
-      var presta = form.presta.value;
-      var manquants = [];
-
-      form.nom.classList.remove('err');
-      form.presta.classList.remove('err');
-
-      if (!nom) { manquants.push('votre nom'); form.nom.classList.add('err'); }
-      if (!presta) { manquants.push('la prestation'); form.presta.classList.add('err'); }
-
-      if (manquants.length) {
+      if (!form.checkValidity()) {
+        form.reportValidity();
         if (hint) {
-          hint.textContent = 'Il manque ' + manquants.join(' et ') + '.';
-          hint.classList.add('err');
+          hint.textContent = 'Complétez le nom et la prestation avant d’envoyer.';
+          hint.className = 'hint err';
         }
-        (manquants[0] === 'votre nom' ? form.nom : form.presta).focus();
         return;
       }
 
-      if (hint) {
-        hint.textContent = 'WhatsApp s’ouvre avec le message préparé.';
-        hint.classList.remove('err');
-      }
+      var get = function (id) {
+        var el = document.getElementById(id);
+        return el && el.value ? el.value.trim() : '';
+      };
 
-      var lignes = ['Bonjour CMY, je souhaite un devis.', ''];
-      lignes.push('Nom : ' + nom);
-      if (form.societe.value.trim()) lignes.push('Entreprise : ' + form.societe.value.trim());
-      lignes.push('Prestation : ' + presta);
-      if (form.dim.value.trim()) lignes.push('Dimensions / quantité : ' + form.dim.value.trim());
-      if (form.lieu.value.trim()) lignes.push('Commune : ' + form.lieu.value.trim());
-      if (form.msg.value.trim()) { lignes.push('', 'Détails :', form.msg.value.trim()); }
+      var lines = ['Bonjour CMY Imprimerie Design,', ''];
+      lines.push('Nom : ' + get('f-nom'));
+      if (get('f-societe')) { lines.push('Entreprise : ' + get('f-societe')); }
+      lines.push('Prestation : ' + get('f-presta'));
+      if (get('f-dim')) { lines.push('Dimensions ou quantité : ' + get('f-dim')); }
+      if (get('f-lieu')) { lines.push('Commune du chantier : ' + get('f-lieu')); }
+      if (get('f-msg')) { lines.push('', 'Détails : ' + get('f-msg')); }
+      lines.push('', 'Merci de me faire un devis.');
 
-      var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lignes.join('\n'));
+      var url = 'https://wa.me/' + TEL + '?text=' + encodeURIComponent(lines.join('\n'));
       window.open(url, '_blank', 'noopener');
-    });
 
-    form.querySelectorAll('input, select, textarea').forEach(function (el) {
-      el.addEventListener('input', function () { el.classList.remove('err'); });
+      if (hint) {
+        hint.textContent = 'WhatsApp est ouvert : relisez, puis envoyez.';
+        hint.className = 'hint ok';
+      }
     });
   }
 
-  /* ------------------------------------------- 6. HORAIRES D'OUVERTURE */
-  /* La Côte d'Ivoire est à UTC+0 toute l'année : on raisonne en UTC pour que
-     le statut soit juste quel que soit le fuseau du visiteur. */
-  var HORAIRES = {
-    1: [8, 17], 2: [8, 17], 3: [8, 17], 4: [8, 17], 5: [8, 17],
-    6: [9, 13], 0: null
-  };
-
-  (function statut() {
-    var now = new Date();
-    var jour = now.getUTCDay();
-    var heure = now.getUTCHours() + now.getUTCMinutes() / 60;
-    var plage = HORAIRES[jour];
-    var ouvert = !!plage && heure >= plage[0] && heure < plage[1];
-
-    var dot = document.querySelector('.status-dot');
-    var texte = document.getElementById('statusText');
-
-    if (dot) dot.classList.add(ouvert ? 'open' : 'closed');
-
-    if (texte) {
-      if (ouvert) {
-        texte.textContent = 'Atelier ouvert — ferme à ' + plage[1] + ':00';
-      } else {
-        var j = jour, i = 0, suivant = null;
-        while (i < 7) { j = (j + 1) % 7; i++; if (HORAIRES[j]) { suivant = j; break; } }
-        var noms = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-        if (plage && heure < plage[0]) {
-          texte.textContent = 'Ouvre aujourd’hui à ' + plage[0] + ':00';
-        } else if (suivant !== null) {
-          texte.textContent = 'Fermé — ouvre ' + noms[suivant] + ' à ' + HORAIRES[suivant][0] + ':00';
-        } else {
-          texte.textContent = 'Fermé';
-        }
-      }
-    }
-
-    var ligne = document.querySelector('#hoursTable tr[data-day="' + jour + '"]');
-    if (ligne) ligne.classList.add('is-today');
-  })();
-
-  /* --------------------------------- 7. PROGRESSION + NAVIGATION ACTIVE */
-  var bar = document.querySelector('.densitobar');
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav a'));
-  var sections = navLinks
+  /* ---------- 7. Section courante dans la navigation ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav a'));
+  var sections = links
     .map(function (a) { return document.querySelector(a.getAttribute('href')); })
     .filter(Boolean);
 
-  var ticking = false;
-
-  function onScroll() {
-    if (bar) {
-      var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.setProperty('--read', h > 0 ? (window.scrollY / h).toFixed(4) : 0);
-    }
-
-    var courante = -1;
-    for (var i = 0; i < sections.length; i++) {
-      if (sections[i].getBoundingClientRect().top <= 120) courante = i;
-    }
-    navLinks.forEach(function (a, i) { a.classList.toggle('is-here', i === courante); });
-
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', function () {
-    if (!ticking) { window.requestAnimationFrame(onScroll); ticking = true; }
-  }, { passive: true });
-  onScroll();
-
-  /* ------------------------------------------ 8. MISE SOUS PRESSE */
-  /* Séquence d'ouverture : le filet se tire, les lignes du titre montent,
-     puis les trois encres se déposent dans l'ordre du passage en quadri —
-     cyan, magenta, jaune. On attend la police : une ligne qui monte pendant
-     que le glyphe change de fonte saute à l'arrivée. */
-  (function ouverture() {
-    var hero = document.querySelector('.spread-hero');
-    var titre = document.querySelector('.spread-hero .lines');
-    var encres = document.getElementById('inkstack');
-
-    function lancer() {
-      if (hero) hero.classList.add('is-in');
-      if (titre) titre.classList.add('is-in');
-      if (encres) encres.parentElement.classList.add('is-in');
-    }
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () { requestAnimationFrame(lancer); });
-      setTimeout(lancer, 1200);   // filet de sécurité si la police ne répond pas
-    } else {
-      lancer();
-    }
-  })();
-
-  /* Les titres de section montent quand la section entre dans le champ. */
-  if ('IntersectionObserver' in window) {
-    var titres = document.querySelectorAll('main .lines:not(.masthead), .foot .lines');
-    var ioTitres = new IntersectionObserver(function (entries) {
+  if (sections.length && 'IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-in');
-        ioTitres.unobserve(entry.target);
+        if (!entry.isIntersecting) { return; }
+        links.forEach(function (a) {
+          a.classList.toggle('is-here', a.getAttribute('href') === '#' + entry.target.id);
+        });
       });
-    }, { rootMargin: '0px 0px -15% 0px', threshold: 0.1 });
-    titres.forEach(function (t) { ioTitres.observe(t); });
-  } else {
-    document.querySelectorAll('.lines').forEach(function (t) { t.classList.add('is-in'); });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    sections.forEach(function (s) { spy.observe(s); });
   }
 
-  /* --------------------------------------- 9. RÉVÉLATION AU DÉFILEMENT */
-  if (!reduced && 'IntersectionObserver' in window) {
-    var cibles = document.querySelectorAll('.trade, .item, .step, .work, .mat tbody tr, .ccol, .aside');
-    cibles.forEach(function (el) { el.classList.add('reveal'); });
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-in');
-        io.unobserve(entry.target);
-      });
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
-
-    cibles.forEach(function (el) { io.observe(el); });
-  }
-
-  /* ------------------------------------------------------ 10. DIVERS */
+  /* ---------- 8. Année du pied de page ---------- */
   var year = document.getElementById('year');
-  if (year) year.textContent = new Date().getFullYear();
+  if (year) { year.textContent = String(new Date().getFullYear()); }
 })();

@@ -1,720 +1,439 @@
-/* =============================================================================
-   CMY IMPRIMERIE DESIGN — Abidjan
-   Système : grille modulaire Müller-Brockmann (12 colonnes / baseline 8 px)
-   Palette : les trois encres du nom — Cyan, Magenta, Yellow — sur papier blanc,
-             encre noire (le K). Surimpression en multiply, comme sur presse.
-   Règles de fabrication : aucune ombre portée, aucune bordure colorée,
-             aplats et filets d'un pixel uniquement.
-   ============================================================================= */
+/* ============================================================
+   CMY IMPRIMERIE DESIGN — direction « CALEPINAGE »
+   ------------------------------------------------------------
+   Un bardage de façade en alucobond est un calepinage : des
+   panneaux de tailles différentes, séparés par un joint creux
+   de 10 mm qui laisse voir l'ossature sombre derrière.
+   Cette page est construite exactement comme ça.
+     · le fond de page EST le joint creux
+     · chaque bloc de contenu EST un panneau
+     · la gouttière de la grille EST le joint
+   Aucune ombre portée, aucune bordure de couleur : les panneaux
+   se distinguent par leur teinte, comme du composite anodisé.
+   ============================================================ */
 
-/* ---------------------------------------------------------------- 1. TOKENS */
+/* ---------- 01. JETONS ---------- */
 :root{
-  /* grille — SOURCE DE VÉRITÉ UNIQUE (contenu ET calque de grille lisent ceci) */
-  --cols:12;
-  --bl:8px;                 /* unité de baseline */
-  --lh:24px;                /* interligne = 3 × baseline */
-  --gutter:24px;
-  --margin:72px;
-  --pad:96px;               /* padding haut/bas de section (× baseline) */
-  --maxw:1296px;
+  /* teintes : ossature, composite, lumière */
+  --joint:#14181C;          /* ossature vue dans le joint creux */
+  --joint-2:#1E242A;        /* panneau sombre */
+  --panel:#F2F3F4;          /* composite blanc */
+  --panel-2:#E4E7E9;        /* composite gris clair */
+  --alu:#C6CCD0;            /* aluminium brossé */
+  --lumen:#FFC22E;          /* la lumière : LED blanc chaud vue de nuit */
+  --lumen-deep:#E5A310;
+  --ink:#14181C;
+  --ink-soft:#5D686F;
+  --ink-inv:#F2F3F4;
+  --ink-inv-soft:#9AA4AB;
 
-  /* encres */
-  --paper:#ffffff;
-  --paper-tint:#f4f4f2;
-  --ink:#0e0f12;            /* le K */
-  --ink-soft:#6a6f76;
-  --ink-line:#d8d8d4;
-  --cyan:#00aeef;
-  --magenta:#ec008c;        /* encre pure : aplats, formes, surimpression */
-  --magenta-ink:#c4007a;    /* même encre, densité montée pour le petit texte (AA sur blanc) */
-  --yellow:#fff200;
-  --accent:var(--magenta);
-  --wa-green:#0d8a3f;       /* vert de rappel WhatsApp, assombri pour rester lisible */
+  /* joint creux : 10 mm à l'échelle de l'écran */
+  --joint-w:10px;
+  --pad:clamp(20px,2.4vw,34px);
+  --radius:3px;             /* tôle pliée, pas du plastique : arête presque vive */
 
-  /* calque de grille */
-  --g-col:rgba(236,0,140,.070);
-  --g-edge:rgba(236,0,140,.38);
-  --g-base:rgba(0,174,239,.34);
-  --g-base-min:rgba(0,174,239,.12);
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-body:"Instrument Sans",system-ui,sans-serif;
 
-  /* type */
-  --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --mono:"Space Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --t-fast:140ms;
+  --t-mid:320ms;
+  --ease:cubic-bezier(.2,.7,.3,1);
 }
 
-/* ------------------------------------------------------------ 2. BASE */
-*{box-sizing:border-box;}
-
-html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%;}
-
+/* ---------- 02. SOCLE ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   margin:0;
-  background:var(--paper);
+  background:var(--joint);
   color:var(--ink);
-  font-family:var(--sans);
+  font-family:var(--f-body);
   font-size:16px;
-  line-height:var(--lh);
-  font-variation-settings:"wdth" 100,"wght" 400;
+  line-height:1.55;
+  font-synthesis-weight:none;
   -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;
 }
+img,svg{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:800;letter-spacing:-.025em;line-height:1.02}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+:focus-visible{outline:3px solid var(--lumen);outline-offset:3px}
 
-img,svg{display:block;max-width:100%;}
-a{color:inherit;}
-button{font:inherit;color:inherit;}
-
-:focus-visible{outline:3px solid var(--magenta-ink);outline-offset:3px;}
-
-::selection{background:var(--yellow);color:var(--ink);}
-
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-  clip:rect(0 0 0 0);white-space:nowrap;border:0;}
-
-.skip{position:absolute;left:-9999px;top:0;z-index:400;background:var(--ink);color:#fff;
-  padding:16px 24px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;}
-.skip:focus{left:0;}
-
-/* ------------------------------------------- 3. GRILLE (source unique) */
-.spread{position:relative;width:100%;}
-.wrap{position:relative;max-width:var(--maxw);margin:0 auto;padding:var(--pad) var(--margin);}
-.grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);
-  column-gap:var(--gutter);row-gap:var(--lh);}
-
-/* une bande occupe toutes les colonnes et les ré-expose en subgrid :
-   chaque enfant se place par LIGNE de colonne, jamais à l'œil */
-.band{grid-column:1 / -1;display:grid;grid-template-columns:subgrid;
-  column-gap:var(--gutter);row-gap:var(--lh);align-items:start;}
-@supports not (grid-template-columns:subgrid){
-  .band{grid-template-columns:repeat(var(--cols),1fr);}
+.skip{
+  position:fixed;top:-100px;left:10px;z-index:200;
+  background:var(--lumen);color:var(--ink);padding:12px 18px;font-weight:600;border-radius:var(--radius);
+  transition:top var(--t-fast) var(--ease);
 }
+.skip:focus{top:10px}
 
-/* ------------------------------- 4. CALQUE DE GRILLE + BASCULE */
-/* le calque vit DANS le même .wrap que le contenu : ses colonnes SONT
-   les colonnes du contenu, à toutes les largeurs de fenêtre */
-.guides{position:absolute;inset:0;pointer-events:none;z-index:60;opacity:0;
-  transition:opacity .26s ease;}
-body.grid-on .guides{opacity:1;}
-.guides .cols{position:absolute;top:0;bottom:0;left:var(--margin);right:var(--margin);
-  display:grid;grid-template-columns:repeat(var(--cols),1fr);column-gap:var(--gutter);}
-.guides .col{background:var(--g-col);
-  box-shadow:inset 1px 0 0 var(--g-edge),inset -1px 0 0 var(--g-edge);position:relative;}
-.guides .col span{position:absolute;top:32px;left:0;right:0;text-align:center;
-  font-family:var(--mono);font-size:10px;line-height:1;color:var(--magenta-ink);}
-.guides .rows{position:absolute;left:var(--margin);right:var(--margin);top:var(--pad);bottom:0;
-  background-image:
-    repeating-linear-gradient(to bottom,var(--g-base) 0 1px,transparent 1px var(--lh)),
-    repeating-linear-gradient(to bottom,var(--g-base-min) 0 1px,transparent 1px var(--bl));}
-.guides .mline{position:absolute;top:0;bottom:0;width:1px;background:var(--g-edge);}
-.guides .mline.l{left:var(--margin);}
-.guides .mline.r{right:var(--margin);}
-
-/* discret au repos pour ne pas couvrir le contenu, franc dès qu'on le vise */
-.toggle{position:fixed;bottom:24px;left:24px;z-index:200;display:flex;align-items:center;gap:8px;
-  background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:var(--mono);
-  font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;
-  opacity:.32;transition:opacity .2s ease,background-color .2s ease;}
-.toggle:hover,.toggle:focus-visible{opacity:1;}
-.toggle .dot{width:8px;height:8px;border-radius:50%;background:#666;}
-body.grid-on .toggle{background:var(--magenta);opacity:1;}
-body.grid-on .toggle .dot{background:#fff;}
-
-/* --------------------------------------------- 5. TYPOGRAPHIE */
-.masthead{
-  font-size:48px;line-height:48px;               /* les deux multiples de 8 */
-  font-variation-settings:"wdth" 92,"wght" 800;
-  letter-spacing:-.025em;text-transform:none;
-  margin:0;padding:0;
+/* ---------- 03. BARRE DE NAVIGATION ---------- */
+.bar{
+  position:sticky;top:0;z-index:100;
+  background:var(--joint);
+  padding:var(--joint-w) var(--joint-w) 0;
 }
-
-h2{
-  font-size:32px;line-height:32px;
-  font-variation-settings:"wdth" 96,"wght" 700;
-  letter-spacing:-.02em;margin:0;
+.bar-in{
+  display:flex;align-items:center;gap:20px;
+  background:var(--panel);
+  border-radius:var(--radius);
+  padding:12px var(--pad);
+  min-height:64px;
 }
+.logo{display:flex;align-items:center;text-decoration:none;flex:0 0 auto}
+/* le logo est un panneau de plus dans le calepinage : arête presque vive */
+.logo-img{height:46px;width:auto;display:block;border-radius:var(--radius)}
+.foot-logo{width:min(230px,100%);height:auto;display:block;border-radius:var(--radius);margin-bottom:14px}
 
-h3{
-  font-size:20px;line-height:24px;
-  font-variation-settings:"wdth" 100,"wght" 700;
-  letter-spacing:-.01em;margin:0;
+.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;font-size:14px;font-weight:500;color:var(--ink-soft);
+  padding:8px 13px;border-radius:var(--radius);
+  transition:color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
 }
+.nav a:hover{color:var(--ink);background:var(--panel-2)}
+.nav a.is-here{color:var(--ink);background:var(--panel-2)}
+.bar-cta{flex:0 0 auto}
+.burger{display:none;width:44px;height:44px;background:var(--panel-2);border:0;border-radius:var(--radius);cursor:pointer;padding:0;place-items:center}
+.burger span{display:block;width:18px;height:2px;background:var(--ink);margin:3px auto;transition:transform var(--t-fast) var(--ease),opacity var(--t-fast)}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
 
-p{margin:0;}
-
-.kicker,.folio,.micro,.item-ref,.item-spec,.work-meta,.aside-k,.coords,.filter,.trade-no,.step-no{
-  font-family:var(--mono);
+/* ---------- 04. LE CALEPINAGE ---------- */
+.lay{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:var(--joint-w);
+  padding:var(--joint-w);
+  max-width:1560px;
+  margin:0 auto;
 }
-
-.kicker{
-  font-size:11px;line-height:16px;letter-spacing:.16em;text-transform:uppercase;
-  display:flex;align-items:center;gap:12px;color:var(--ink);
+.tile{
+  grid-column:var(--c,1/13);
+  grid-row:var(--r,auto);
+  background:var(--panel);
+  border-radius:var(--radius);
+  padding:var(--pad);
+  display:flex;flex-direction:column;gap:12px;
+  position:relative;overflow:hidden;
+  transition:background var(--t-mid) var(--ease);
 }
-.kicker-r{justify-content:flex-start;}
+/* teintes de panneau — jamais une bordure, seulement un aplat */
+.t-alu{background:var(--alu)}
+.t-dark{background:var(--joint-2);color:var(--ink-inv)}
+.t-dark .tile-k,.t-dark .micro,.t-dark .desc,.t-dark p{color:var(--ink-inv-soft)}
+.t-dark h2,.t-dark h3,.t-dark .stat{color:var(--ink-inv)}
+.t-lum{background:var(--lumen)}
+.t-lum .tile-k,.t-lum .tile-cap{color:#6B4B00}
 
-.folio{
-  font-size:11px;line-height:16px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--ink-soft);padding-top:8px;
-}
+/* ---------- 05. TYPOGRAPHIE DE PANNEAU ---------- */
+.eyebrow{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.led{width:9px;height:9px;border-radius:50%;background:var(--lumen);flex:0 0 auto}
+.folio{font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.tile-k{font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}
+.tile-cap{font-size:12px;color:var(--ink-soft);margin-top:auto}
+.micro{font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
 
-.micro{font-size:11px;line-height:16px;letter-spacing:.06em;color:var(--ink-soft);}
-.micro-r{text-align:right;}
+h1{font-size:clamp(38px,5.6vw,76px);letter-spacing:-.04em}
+h1 em{font-style:normal;color:var(--lumen-deep)}
+h2{font-size:clamp(27px,3.3vw,46px)}
+h3{font-size:clamp(18px,1.4vw,22px);font-weight:600;letter-spacing:-.02em}
+.lede{font-size:clamp(15.5px,1.15vw,18px);color:var(--ink-soft);max-width:52ch}
+.head-note{font-size:14.5px;color:var(--ink-soft);max-width:58ch}
+.desc{font-size:14.5px;color:var(--ink-soft)}
+.spec{font-size:12.5px;color:var(--ink-soft);letter-spacing:.01em;margin-top:auto;padding-top:6px}
+.ref{font-size:11.5px;font-weight:600;letter-spacing:.11em;color:var(--lumen-deep)}
+.t-dark .ref{color:var(--lumen)}
+.t-lum .ref{color:#6B4B00}
+.mat-sub{font-size:12.5px;color:var(--ink-soft);margin-top:-8px}
 
-.lede{font-size:17px;line-height:24px;font-variation-settings:"wdth" 100,"wght" 400;}
+.t-head{gap:14px}
+.t-head h2{max-width:22ch}
+.lay-hero{padding-top:calc(var(--joint-w) * 2)}
+.t-title{justify-content:center;gap:20px;padding-block:clamp(34px,4vw,58px)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 
-.note{
-  font-family:var(--mono);font-size:12px;line-height:24px;letter-spacing:.03em;
-  color:var(--ink-soft);display:flex;gap:12px;align-items:flex-start;
-  border-top:1px solid var(--ink-line);padding-top:16px;
-}
-.note-dark{color:rgba(255,255,255,.6);border-top-color:rgba(255,255,255,.18);}
-
-.lnk{
-  color:var(--ink);text-decoration:none;
-  background-image:linear-gradient(var(--magenta-ink),var(--magenta-ink));
-  background-size:100% 1px;background-position:0 100%;background-repeat:no-repeat;
-  padding-bottom:2px;transition:background-size .2s ease;
-}
-.lnk:hover{background-size:100% 3px;}
-
-kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--ink-line);
-  padding:1px 5px;border-radius:2px;}
-
-/* repère de calage — la mire d'imprimeur, utilisée comme puce structurelle */
-.reg{
-  flex:0 0 auto;position:relative;width:14px;height:14px;margin-top:1px;
-  border-radius:50%;border:1px solid currentColor;
-}
-.reg::before,.reg::after{content:"";position:absolute;background:currentColor;}
-.reg::before{left:50%;top:-4px;bottom:-4px;width:1px;transform:translateX(-.5px);}
-.reg::after{top:50%;left:-4px;right:-4px;height:1px;transform:translateY(-.5px);}
-
-/* ------------------------------------------------ 6. BOUTONS */
+/* ---------- 06. BOUTONS ---------- */
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  height:48px;padding:0 24px;border:none;cursor:pointer;text-decoration:none;
-  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
-  transition:background-color .18s ease,color .18s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px 22px;border-radius:var(--radius);border:0;cursor:pointer;
+  font-family:var(--f-body);font-size:14.5px;font-weight:600;text-decoration:none;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
 }
-/* Le fond de survol est peint par un aplat qui monte du bas (section 19 bis).
-   On ne repasse donc jamais par le raccourci `background` au survol : il
-   effacerait l'image de fond et supprimerait le remplissage. */
-.btn-ink{background-color:var(--ink);color:#fff;--btn-ink-fill:var(--magenta);}
-.btn-line{background-color:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);
-  --btn-ink-fill:var(--ink);}
-.btn-wa{background-color:var(--ink);color:#fff;}
+.btn:active{transform:translateY(1px)}
+.btn-lum{background:var(--lumen);color:var(--ink)}
+.btn-lum:hover{background:var(--lumen-deep)}
+.btn-ghost{background:var(--panel-2);color:var(--ink)}
+.btn-ghost:hover{background:var(--alu)}
+.btn-ghost-lum{background:transparent;color:var(--lumen);box-shadow:inset 0 0 0 1.5px var(--lumen)}
+.btn-ghost-lum:hover{background:var(--lumen);color:var(--ink)}
+.t-note.t-dark .btn-ghost-lum{align-self:flex-start}
+.btn-wa{background:#1FA855;color:#fff}
+.btn-wa:hover{background:#17904A}
+.wa{width:17px;height:17px;flex:0 0 auto;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.06c-.24.68-1.42 1.31-1.95 1.36-.5.05-.95.23-3.2-.67-2.7-1.06-4.4-3.8-4.53-3.98-.13-.18-1.08-1.44-1.08-2.75s.69-1.95.93-2.22c.24-.26.53-.33.7-.33.18 0 .35 0 .5.01.16.01.38-.06.59.45.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.1.18-.15.29-.29.45-.15.16-.31.36-.44.48-.15.14-.3.3-.13.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.29 2.33 1.44.29.14.46.12.63-.07.18-.2.73-.85.92-1.14.19-.29.39-.24.65-.14.27.09 1.67.79 1.96.93.29.14.48.21.55.33.07.11.07.66-.17 1.34Z'/></svg>") center/contain no-repeat;
+          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.06c-.24.68-1.42 1.31-1.95 1.36-.5.05-.95.23-3.2-.67-2.7-1.06-4.4-3.8-4.53-3.98-.13-.18-1.08-1.44-1.08-2.75s.69-1.95.93-2.22c.24-.26.53-.33.7-.33.18 0 .35 0 .5.01.16.01.38-.06.59.45.24.57.81 1.97.88 2.11.07.14.12.31.02.5-.1.18-.15.29-.29.45-.15.16-.31.36-.44.48-.15.14-.3.3-.13.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.29 2.33 1.44.29.14.46.12.63-.07.18-.2.73-.85.92-1.14.19-.29.39-.24.65-.14.27.09 1.67.79 1.96.93.29.14.48.21.55.33.07.11.07.66-.17 1.34Z'/></svg>") center/contain no-repeat}
 
-.wa-glyph{
-  width:16px;height:16px;flex:0 0 auto;background:currentColor;
-  -webkit-mask:var(--wa) center/contain no-repeat;mask:var(--wa) center/contain no-repeat;
-  --wa:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2C8.8 2 3 7.8 3 15c0 2.4.7 4.7 1.9 6.7L3 30l8.5-1.9c1.9 1 4.1 1.6 6.5 1.6h.1C23.2 29.7 29 23.9 29 16.7 29 9.5 23.2 2 16 2zm0 25c-2 0-4-.5-5.7-1.6l-.4-.2-4.2.9.9-4.1-.3-.4A11.6 11.6 0 0 1 4.6 15C4.6 8.7 9.7 3.6 16 3.6S27.4 8.7 27.4 15 22.3 27 16 27zm6.4-8.3c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a9.2 9.2 0 0 1-4.5-4c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.2 1.2-1.2 3s1.3 3.4 1.4 3.6c.2.2 2.5 3.9 6.1 5.4 2.2 1 3.1 1.1 4.2.9.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z'/%3E%3C/svg%3E");
+/* ---------- 07. SIGNATURE : L'ENSEIGNE QUI S'ALLUME ---------- */
+.t-sign{justify-content:space-between;min-height:clamp(240px,26vw,340px)}
+.sign{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,22px);
+  position:relative;
 }
-
-.wa-float{
-  position:fixed;right:24px;bottom:24px;z-index:190;
-  width:56px;height:56px;border-radius:50%;background:var(--wa-green);color:#fff;
-  display:flex;align-items:center;justify-content:center;text-decoration:none;
-  transition:transform .2s ease,background-color .2s ease;
+/* l'enseigne de la maison, faces diffusantes éteintes tant que le courant
+   n'est pas mis : le composite reste terne, sans lumière propre */
+.sign-logo{
+  width:min(100%,420px);height:auto;position:relative;z-index:1;
+  border-radius:var(--radius);
+  filter:brightness(.82) saturate(.72) contrast(.94);
+  transition:filter 620ms var(--ease);
 }
-.wa-float .wa-glyph{width:26px;height:26px;}
-.wa-float:hover{transform:scale(1.06);background:var(--ink);}
-
-/* ---------------------------- 7. BARRE DENSITOMÉTRIQUE (progression) */
-/* la bande de contrôle qu'on imprime en bord de feuille, ici en jauge de lecture */
-.densitobar{position:fixed;top:0;left:0;right:0;height:4px;z-index:300;display:flex;
-  transform:scaleX(var(--read,0));transform-origin:0 50%;}
-.densitobar i{flex:1;height:100%;}
-.densitobar .c{background:var(--cyan);}
-.densitobar .m{background:var(--magenta);}
-.densitobar .y{background:var(--yellow);}
-.densitobar .k{background:var(--ink);}
-
-/* la même bande, au repos, en pied de page */
-/* encres pures, puis leurs surimpressions deux à deux, puis le noir et un gris 50 % */
-.colorbar{height:16px;background:linear-gradient(to right,
-  var(--cyan) 0 12.5%, #2e3192 12.5% 25%, var(--magenta) 25% 37.5%, #ed1c24 37.5% 50%,
-  var(--yellow) 50% 62.5%, #00a651 62.5% 75%, var(--ink) 75% 87.5%, #8a8f95 87.5% 100%);}
-
-/* ------------------------------------------------- 8. EN-TÊTE */
-.topbar{position:sticky;top:0;z-index:150;background:var(--paper);
-  border-bottom:1px solid var(--ink-line);}
-.topbar-in{max-width:var(--maxw);margin:0 auto;padding:0 var(--margin);
-  height:72px;display:flex;align-items:center;gap:32px;}
-
-.mark{display:flex;align-items:center;text-decoration:none;flex:0 0 auto;}
-/* le logo de la maison : sa hauteur est un multiple de la baseline */
-.mark-img{height:48px;width:auto;display:block;}
-
-.nav{display:flex;gap:24px;margin-left:auto;}
-.nav a{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-decoration:none;
-  text-transform:uppercase;color:var(--ink-soft);padding:4px 0;transition:color .16s ease;
-  border-bottom:2px solid transparent;}
-.nav a:hover{color:var(--ink);}
-.nav a.is-here{color:var(--ink);border-bottom-color:var(--magenta);}
-
-.topbar-cta{height:40px;padding:0 16px;flex:0 0 auto;}
-
-.burger{display:none;width:40px;height:40px;background:none;border:none;cursor:pointer;
-  flex-direction:column;justify-content:center;gap:5px;padding:0;margin-left:auto;}
-.burger span{display:block;height:2px;width:22px;background:var(--ink);transition:transform .2s ease,opacity .2s ease;}
-.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
-.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-
-/* ----------------------------------------------------- 9. MASTHEAD */
-.spread-hero .wrap{padding-top:48px;padding-bottom:96px;}
-.hero-top{padding-bottom:24px;}
-.hero-top .kicker{border-top:1px solid var(--ink);padding-top:16px;}
-
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-soft);flex:0 0 auto;}
-.status-dot.open{background:var(--wa-green);}
-.status-dot.closed{background:var(--magenta);}
-
-.masthead{margin-bottom:24px;}
-
-/* SIGNATURE — surimpression des trois encres */
-.inkstack{align-self:end;}
-.inkstack-in{position:relative;height:192px;isolation:isolate;margin-bottom:16px;}
-.ink-disc{position:absolute;width:120px;height:120px;border-radius:50%;mix-blend-mode:multiply;}
-.d-c{background:var(--cyan);   left:0;   top:0;    animation:drift-c 14s ease-in-out infinite;}
-.d-m{background:var(--magenta);left:48px;top:56px; animation:drift-m 16s ease-in-out infinite;}
-.d-y{background:var(--yellow); left:96px;top:8px;  animation:drift-y 18s ease-in-out infinite;}
-
-@keyframes drift-c{50%{transform:translate(10px,14px);}}
-@keyframes drift-m{50%{transform:translate(-14px,-10px);}}
-@keyframes drift-y{50%{transform:translate(6px,-16px);}}
-
-.hero-foot{border-top:1px solid var(--ink-line);padding-top:24px;}
-.hero-cta{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
-.hero-cta .btn{width:100%;}
-
-.facts{list-style:none;margin:0;padding:0;}
-.facts li{display:flex;gap:16px;align-items:baseline;padding-bottom:16px;}
-.facts b{font-family:var(--mono);font-size:20px;line-height:24px;flex:0 0 56px;color:var(--ink);}
-.facts span{font-size:13px;line-height:16px;color:var(--ink-soft);}
-
-/* ------------------------------------------------- 10. TÊTES DE SECTION */
-.shead{padding-bottom:48px;border-bottom:1px solid var(--ink);margin-bottom:24px;}
-.shead-note{font-size:13px;line-height:24px;color:var(--ink-soft);padding-top:8px;}
-
-.spread-tint{background:var(--paper-tint);}
-.spread-dark{background:var(--ink);color:var(--paper);}
-.spread-dark h2,.spread-dark h3{color:var(--paper);}
-.spread-dark .shead{border-bottom-color:rgba(255,255,255,.28);}
-.spread-dark .folio{color:rgba(255,255,255,.5);}
-
-/* ------------------------------------------------------ 11. MÉTIERS */
-.trades{row-gap:48px;}
-.trade{border-top:2px solid var(--ink);padding-top:24px;position:relative;}
-.trade-ink{position:absolute;top:-2px;left:0;width:64px;height:2px;}
-.t-c .trade-ink{background:var(--cyan);}
-.t-m .trade-ink{background:var(--magenta);}
-.t-y .trade-ink{background:var(--yellow);}
-
-.trade-no{font-size:12px;line-height:16px;letter-spacing:.2em;color:var(--ink-soft);margin-bottom:8px;}
-.trade h3{margin-bottom:16px;}
-.trade p{font-size:14px;line-height:24px;color:var(--ink-soft);margin-bottom:24px;}
-
-.tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;}
-.tags li{font-family:var(--mono);font-size:11px;line-height:16px;letter-spacing:.04em;
-  background:var(--paper-tint);padding:4px 8px;color:var(--ink);}
-.spread-tint .tags li{background:var(--paper);}
-
-.note-cta{display:flex;justify-content:flex-end;}
-
-/* ---------------------------------------------------- 12. CATALOGUE */
-.filters{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:24px;}
-.filter{background:transparent;border:none;cursor:pointer;padding:8px 12px;
-  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);
-  box-shadow:inset 0 0 0 1px var(--ink-line);transition:all .16s ease;display:flex;gap:8px;align-items:center;}
-.filter:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);}
-.filter.is-on{background:var(--ink);color:#fff;box-shadow:none;}
-.filter-n{opacity:.5;}
-
-.catalogue{grid-column:1 / -1;display:grid;grid-template-columns:subgrid;
-  column-gap:var(--gutter);row-gap:48px;}
-@supports not (grid-template-columns:subgrid){
-  .catalogue{grid-template-columns:repeat(var(--cols),1fr);}
+.sign-glow{
+  position:absolute;inset:14% 6%;
+  background:radial-gradient(ellipse at center,rgba(255,255,255,.85),rgba(255,255,255,0) 68%);
+  opacity:0;pointer-events:none;
+  transition:opacity 600ms var(--ease);
 }
-.item{grid-column:span 3;border-top:1px solid var(--ink);padding-top:16px;}
-.item.is-out{display:none;}
+/* mise sous tension : les faces montent en lumière, puis le halo suit */
+.t-sign.lit .sign-logo{filter:brightness(1.06) saturate(1.04) contrast(1)}
+.t-sign.lit .sign-glow{opacity:.5;transition-delay:420ms}
 
-.plate{height:168px;background:var(--paper);margin-bottom:16px;overflow:hidden;}
-.spread-tint .plate{background:var(--paper);}
-.plate svg{width:100%;height:100%;}
-.item:hover .plate{background:var(--paper-tint);}
-.spread-tint .item:hover .plate{background:#eaeae7;}
-.plate{transition:background-color .2s ease;}
+/* ---------- 08. STATISTIQUES ---------- */
+.stat{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,4.4vw,62px);line-height:.9;letter-spacing:-.04em}
+.stat-lbl{font-size:13.5px;color:var(--ink-soft);max-width:26ch}
+.t-alu .stat-lbl{color:#48525A}
+.t-hours{justify-content:space-between}
+.status{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:600}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--ink-soft);flex:0 0 auto}
+.status-dot.open{background:#1FA855}
+.status-dot.closed{background:#C2410C}
+.tel{font-family:var(--f-display);font-weight:600;font-size:clamp(17px,1.5vw,21px);letter-spacing:-.02em;text-decoration:none}
+.tel:hover{color:var(--lumen-deep)}
+.t-dark .tel:hover{color:var(--lumen)}
+.tel-lg{font-size:clamp(21px,2vw,28px);font-weight:800}
 
-.item-ref{font-size:11px;line-height:16px;letter-spacing:.14em;color:var(--magenta-ink);margin-bottom:4px;}
-.item h3{margin-bottom:8px;}
-.item-desc{font-size:13px;line-height:24px;color:var(--ink-soft);margin-bottom:8px;}
-.item-spec{font-size:11px;line-height:16px;letter-spacing:.04em;color:var(--ink);}
+/* ---------- 09. PÔLES + FORMES ---------- */
+.t-pole{min-height:clamp(250px,24vw,320px);justify-content:flex-end}
+/* les formes reprennent la géométrie de l'objet fabriqué, pas une décoration */
+.pole-shape{position:absolute;pointer-events:none;transition:transform 700ms var(--ease)}
+.ps-caisson{
+  top:-30px;right:-30px;width:190px;height:120px;border-radius:var(--radius);
+  background:var(--panel-2);
+}
+.ps-caisson::after{content:"";position:absolute;inset:22px;border-radius:2px;background:var(--alu)}
+.ps-rouleau{
+  top:-46px;right:-46px;width:180px;height:180px;border-radius:50%;
+  background:var(--panel-2);
+}
+.ps-rouleau::after{content:"";position:absolute;inset:44px;border-radius:50%;background:var(--alu)}
+.ps-stock{top:-24px;right:-24px;width:170px;height:130px;
+  background:repeating-linear-gradient(180deg,rgba(20,24,28,.13) 0 12px,transparent 12px 24px)}
+.t-pole:hover .pole-shape{transform:translate(-8px,8px)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chips li{font-size:12px;font-weight:500;padding:5px 10px;border-radius:2px;background:rgba(20,24,28,.07)}
+.t-lum .chips li{background:rgba(20,24,28,.13)}
 
-.empty{grid-column:1 / -1;font-family:var(--mono);font-size:13px;color:var(--ink-soft);padding:48px 0;}
+/* ---------- 10. CATALOGUE ---------- */
+.lay-cat{padding-bottom:var(--joint-w)}
+.t-filters{padding:14px var(--pad)}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filter{
+  font-family:var(--f-body);font-size:13.5px;font-weight:500;color:var(--ink-soft);
+  background:var(--panel-2);border:0;border-radius:var(--radius);padding:9px 15px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+}
+.filter span{font-size:11px;font-weight:600;opacity:.55}
+.filter:hover{background:var(--alu);color:var(--ink)}
+.filter.is-on{background:var(--ink);color:var(--ink-inv)}
+.filter.is-on span{opacity:.7}
 
-/* ----------------------------------------------------- 13. MATIÈRES */
-.table-wrap{overflow-x:auto;}
-.mat{width:100%;border-collapse:collapse;text-align:left;min-width:720px;}
-.mat th,.mat td{padding:16px 24px 16px 0;vertical-align:top;border-bottom:1px solid var(--ink-line);}
-.mat thead th{font-family:var(--mono);font-size:11px;line-height:16px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--ink-soft);font-weight:400;border-bottom:1px solid var(--ink);padding-bottom:8px;}
-.mat tbody th{font-size:17px;line-height:24px;font-variation-settings:"wdth" 100,"wght" 700;width:22%;}
-.mat .th-sub{display:block;font-family:var(--mono);font-size:11px;line-height:16px;
-  letter-spacing:.04em;color:var(--ink-soft);font-variation-settings:normal;font-weight:400;}
-.mat tbody td{font-size:13px;line-height:24px;color:var(--ink-soft);}
-.mat .col-ref{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink);width:80px;}
-.mat tbody tr:hover{background:var(--paper-tint);}
+.cat-grid{
+  grid-column:1/13;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));
+  gap:var(--joint-w);
+}
+/* les vignettes vivent dans leur propre grille : elles ne suivent pas les travées de la page */
+.cat-grid .tile{grid-column:auto;grid-row:auto}
+.t-item{gap:9px;padding:var(--pad)}
+.t-item h3{font-size:17.5px}
+.fig{
+  background:var(--panel-2);border-radius:2px;margin:-6px -6px 6px;
+  transition:background var(--t-mid) var(--ease);
+}
+.fig svg{width:100%;height:auto}
+/* les aplats du dessin technique */
+.f-lum{fill:var(--lumen)}
+.f-ink{fill:var(--ink)}
+.f-pap{fill:var(--panel)}
+.f-alu{fill:var(--alu)}
+.f-alu2{fill:#B2B9BE}
+.f-halo{fill:rgba(255,194,46,.34)}
+/* au survol le panneau s'allume : le fond de la vignette passe à la lumière */
+.t-item:hover{background:var(--panel-2)}
+.t-item:hover .fig{background:#FFF3CE}
+.empty{grid-column:1/13;background:var(--panel);border-radius:var(--radius);padding:var(--pad);color:var(--ink-soft)}
 
-/* ------------------------------------------------------ 14. PROCÉDÉ */
-.steps{row-gap:48px;}
-.step{border-top:1px solid rgba(255,255,255,.28);padding-top:24px;}
-.step-no{margin-bottom:16px;}
-.numeral{display:inline-block;font-family:var(--mono);font-size:56px;line-height:56px;
-  color:var(--yellow);}
-.step h3{margin-bottom:8px;}
-.step p{font-size:13px;line-height:24px;color:rgba(255,255,255,.62);}
+/* ---------- 11. DÉPÔT ---------- */
+.t-mat{min-height:220px;gap:8px}
+.mat-shape{position:absolute;top:var(--pad);right:var(--pad);width:52px;height:52px;pointer-events:none}
+.ms-plaque{background:var(--panel-2);border-radius:2px;transform:rotate(-8deg)}
+.ms-compo{background:linear-gradient(180deg,var(--alu) 0 38%,var(--panel-2) 38% 62%,var(--alu) 62% 100%);border-radius:2px}
+.ms-plexi{background:rgba(198,204,208,.55);border-radius:2px}
+.ms-plexi::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.9) 0 30%,transparent 30%)}
+.ms-entretoise{border-radius:50%;background:var(--panel-2)}
+.ms-entretoise::after{content:"";position:absolute;inset:15px;border-radius:50%;background:var(--alu)}
+.ms-transfo{background:var(--panel-2);border-radius:2px}
+.ms-transfo::after{content:"";position:absolute;left:9px;right:9px;top:16px;height:20px;
+  background:repeating-linear-gradient(90deg,var(--alu) 0 4px,transparent 4px 9px)}
+.ms-led{background:transparent}
+.ms-led::after{content:"";position:absolute;inset:8px 0;
+  background:radial-gradient(circle at 8px 50%,rgba(20,24,28,.55) 0 4px,transparent 4px),
+             radial-gradient(circle at 26px 50%,rgba(20,24,28,.55) 0 4px,transparent 4px),
+             radial-gradient(circle at 44px 50%,rgba(20,24,28,.55) 0 4px,transparent 4px)}
+.t-note{padding:18px var(--pad);justify-content:center}
+.t-note p{font-size:14.5px;color:var(--ink-soft)}
 
-/* ----------------------------------------------------- 15. CHANTIERS */
-.works{row-gap:48px;}
-.work{border-top:1px solid var(--ink);padding-top:16px;}
-.work-plate{position:relative;height:264px;background:var(--paper-tint);
-  margin-bottom:16px;overflow:hidden;isolation:isolate;}
-.w-lg .work-plate{height:336px;}
-/* ligne de sol : seulement là où la pièce se pose au sol (pas pour le mural) */
-.wp-1::after,.wp-2::after,.wp-4::after{
-  content:"";position:absolute;left:8%;right:8%;bottom:14%;height:2px;background:var(--ink);}
-.wshape{position:absolute;mix-blend-mode:multiply;}
+/* ---------- 12. ATELIER ---------- */
+.lay-dark{background:var(--joint)}
+.t-step{min-height:190px;justify-content:flex-start;gap:10px}
+.step-n{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;letter-spacing:-.04em;color:var(--lumen)}
+.t-lum .step-n{color:#6B4B00}
+.t-step h3{margin-top:2px}
 
-/* devanture : bandeau d'enseigne, deux vitrines, porte centrale */
-.wp-1 .s1{left:8%;top:18%;width:84%;height:18%;background:var(--cyan);}
-.wp-1 .s2{left:8%;top:44%;width:32%;height:42%;background:var(--magenta);}
-.wp-1 .s3{left:60%;top:44%;width:32%;height:42%;background:var(--yellow);}
-.wp-1 .s4{left:44%;top:52%;width:12%;height:34%;background:var(--ink);}
+/* ---------- 13. CHANTIERS ---------- */
+.t-work{gap:10px;min-height:240px}
+.work-fig{
+  display:grid;gap:4px;height:clamp(120px,13vw,190px);margin:-6px -6px 8px;
+  background:var(--panel-2);border-radius:2px;padding:14px;
+}
+.work-fig span{border-radius:1px;background:var(--alu);transition:background var(--t-mid) var(--ease)}
+/* chaque figure est le schéma du chantier décrit */
+.wf-1{grid-template-columns:2fr 1fr 1fr;grid-template-rows:1fr 2fr}
+.wf-1 span:nth-child(1){grid-column:1/4;background:var(--ink)}
+.wf-2{grid-template-columns:1fr 2fr 1fr;grid-template-rows:repeat(3,1fr)}
+.wf-2 span:nth-child(1){grid-column:2;grid-row:1/4;background:var(--lumen)}
+.wf-2 span:nth-child(4){grid-column:1/4;grid-row:3;height:8px;align-self:end;background:var(--ink)}
+.wf-3{grid-template-columns:repeat(4,1fr)}
+.wf-3 span:nth-child(1){grid-column:1/5;background:var(--ink)}
+.wf-4{grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr}
+.wf-4 span:nth-child(1){grid-row:1/3;background:var(--lumen)}
+.wf-5{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr)}
+.wf-5 span:nth-child(1){grid-row:1/4;background:var(--ink)}
+.t-work:hover .work-fig span:nth-child(1){background:var(--lumen)}
 
-/* totem : mât fin, caisson d'identification en tête, bandeau locataire, massif */
-.wp-2 .s1{left:46%;top:52%;width:8%;height:34%;background:var(--ink);}
-.wp-2 .s2{left:32%;top:14%;width:36%;height:26%;background:var(--cyan);}
-.wp-2 .s3{left:32%;top:40%;width:36%;height:12%;background:var(--yellow);}
-.wp-2 .s4{left:30%;top:80%;width:40%;height:6%;background:var(--ink);}
-
-/* bâche : toile tendue sur ossature, deux lignes de message, lest en pied */
-.wp-3 .s1{left:10%;top:24%;width:80%;height:46%;background:var(--magenta);}
-.wp-3 .s2{left:20%;top:36%;width:60%;height:10%;background:var(--cyan);}
-.wp-3 .s3{left:20%;top:52%;width:36%;height:8%;background:var(--cyan);}
-.wp-3 .s4{left:10%;top:76%;width:80%;height:2%;background:var(--ink);}
-
-/* covering : caisse du véhicule, cabine, deux roues */
-.wp-4 .s1{left:10%;top:38%;width:66%;height:32%;background:var(--yellow);}
-.wp-4 .s2{left:70%;top:48%;width:20%;height:22%;background:var(--cyan);}
-.wp-4 .s3{left:22%;top:66%;width:14%;height:16%;border-radius:50%;background:var(--ink);}
-.wp-4 .s4{left:66%;top:66%;width:14%;height:16%;border-radius:50%;background:var(--ink);}
-
-/* signalétique : plaque murale, plaque de porte, panneau directionnel fléché */
-.wp-5 .s1{left:12%;top:20%;width:32%;height:56%;background:var(--cyan);}
-.wp-5 .s2{left:52%;top:20%;width:36%;height:20%;background:var(--magenta);}
-.wp-5 .s3{left:52%;top:52%;width:26%;height:14%;background:var(--ink);}
-.wp-5 .s4{left:78%;top:52%;width:0;height:0;background:none;
-  border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:16px solid var(--ink);}
-
-.work-meta{font-size:11px;line-height:16px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--magenta-ink);margin-bottom:8px;}
-.work h3{margin-bottom:8px;}
-.work p{font-size:13px;line-height:24px;color:var(--ink-soft);}
-
-/* -------------------------------------------------------- 16. DEVIS */
-.form{display:flex;flex-direction:column;gap:24px;}
-.field{display:flex;flex-direction:column;gap:8px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-
-label{font-family:var(--mono);font-size:11px;line-height:16px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--ink);}
-.opt{color:var(--ink-soft);letter-spacing:.04em;text-transform:none;}
-
+/* ---------- 14. FORMULAIRE ---------- */
+.t-form{padding:var(--pad)}
+form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-size:12.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
+.opt{text-transform:none;letter-spacing:0;font-weight:400}
 input,select,textarea{
-  font-family:var(--sans);font-size:15px;line-height:24px;color:var(--ink);
-  background:var(--paper);border:none;box-shadow:inset 0 0 0 1px var(--ink-line);
-  padding:12px 16px;width:100%;border-radius:0;-webkit-appearance:none;appearance:none;
-  transition:box-shadow .16s ease;
+  font-family:var(--f-body);font-size:15.5px;color:var(--ink);
+  background:var(--panel-2);border:0;border-radius:var(--radius);
+  padding:13px 15px;width:100%;
+  transition:background var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease);
 }
-textarea{resize:vertical;min-height:120px;}
-select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),
-  linear-gradient(135deg,var(--ink) 50%,transparent 50%);
-  background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;
-  background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:44px;}
-input:hover,select:hover,textarea:hover{box-shadow:inset 0 0 0 1px var(--ink-soft);}
-input:focus,select:focus,textarea:focus{box-shadow:inset 0 0 0 2px var(--ink);outline:none;}
-input.err,select.err{box-shadow:inset 0 0 0 2px var(--magenta);}
-::placeholder{color:#a5a9ae;}
+input::placeholder,textarea::placeholder{color:#8B959B}
+input:focus,select:focus,textarea:focus{outline:0;background:#fff;box-shadow:inset 0 0 0 2px var(--ink)}
+input:user-invalid,select:user-invalid{box-shadow:inset 0 0 0 2px #C2410C}
+textarea{resize:vertical;min-height:104px}
+select{appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%235D686F' stroke-width='1.8'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+.form-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.hint{font-size:13px;color:var(--ink-soft)}
+.hint.ok{color:#1FA855;font-weight:600}
+.hint.err{color:#C2410C;font-weight:600}
+.t-aside{gap:14px}
+.aside-list{display:flex;flex-direction:column;gap:11px}
+.aside-list li{font-size:14px;color:var(--ink-inv-soft);padding-left:17px;position:relative}
+.aside-list li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--lumen)}
+.aside-list b{color:var(--ink-inv);font-weight:600}
 
-.form-foot{display:flex;align-items:center;gap:24px;flex-wrap:wrap;
-  border-top:1px solid var(--ink-line);padding-top:24px;}
-.form-hint{font-family:var(--mono);font-size:11px;line-height:16px;color:var(--ink-soft);}
-.form-hint.err{color:var(--magenta-ink);}
+/* ---------- 15. CONTACT ---------- */
+address{font-style:normal;font-size:15px;line-height:1.6}
+.lnk{font-size:14px;font-weight:600;color:var(--lumen-deep);text-decoration:none;border-bottom:1.5px solid currentColor;align-self:flex-start;padding-bottom:1px}
+.lnk:hover{color:var(--ink)}
+.hours{width:100%;border-collapse:collapse;font-size:14px}
+.hours th,.hours td{text-align:left;padding:6px 0;font-weight:400}
+.hours th{color:#48525A;font-weight:500}
+.hours td{text-align:right;font-variant-numeric:tabular-nums}
+.hours tr.today th,.hours tr.today td{font-weight:700;color:var(--ink)}
+.hours .closed{color:#8A4A2A}
+.col-cta{display:flex;flex-direction:column;gap:9px;margin-top:auto;align-items:stretch}
+.col-cta .btn{width:100%}
 
-.aside{border-top:2px solid var(--ink);padding-top:24px;}
-.aside-k{font-size:11px;line-height:16px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--ink-soft);margin-bottom:16px;}
-.aside-list{list-style:none;margin:0 0 32px;padding:0;}
-.aside-list li{font-size:13px;line-height:24px;color:var(--ink-soft);
-  padding:0 0 16px 20px;position:relative;}
-.aside-list li::before{content:"";position:absolute;left:0;top:11px;width:8px;height:2px;background:var(--magenta);}
-.aside-list b{color:var(--ink);font-variation-settings:"wdth" 100,"wght" 700;}
+/* ---------- 16. PIED ---------- */
+.foot{padding-bottom:var(--joint-w)}
+.foot-nav{display:flex;flex-direction:column;gap:7px}
+.foot-nav a{font-size:14px;color:var(--ink-inv-soft);text-decoration:none;width:fit-content}
+.foot-nav a:hover{color:var(--lumen)}
+.t-foot-end{flex-direction:row;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  background:var(--joint-2);padding:16px var(--pad)}
+.t-foot-end .micro{color:var(--ink-inv-soft)}
 
-.bigtel{display:block;font-size:24px;line-height:32px;font-variation-settings:"wdth" 92,"wght" 700;
-  letter-spacing:-.01em;text-decoration:none;margin-bottom:8px;}
-.bigtel:hover{color:var(--magenta-ink);}
-
-/* ------------------------------------------------------ 17. CONTACT */
-.contact{row-gap:48px;}
-.ccol{border-top:1px solid var(--ink);padding-top:24px;}
-address{font-style:normal;font-size:15px;line-height:24px;margin-bottom:16px;}
-.coords{font-size:11px;line-height:16px;letter-spacing:.08em;color:var(--ink-soft);margin-top:16px;}
-
-.hours{width:100%;border-collapse:collapse;}
-.hours th,.hours td{padding:4px 0;font-size:14px;line-height:24px;text-align:left;font-weight:400;}
-.hours th{font-variation-settings:"wdth" 100,"wght" 400;color:var(--ink-soft);}
-.hours td{text-align:right;font-family:var(--mono);font-size:12px;}
-.hours .closed{color:var(--ink-soft);}
-.hours tr.is-today th,.hours tr.is-today td{color:var(--ink);font-variation-settings:"wdth" 100,"wght" 700;}
-.hours tr.is-today th::after{content:" · aujourd'hui";font-family:var(--mono);font-size:10px;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--magenta-ink);font-variation-settings:normal;}
-
-.ccta{display:flex;flex-direction:column;gap:8px;align-items:stretch;margin-top:24px;}
-
-/* --------------------------------------------------------- 18. PIED */
-.foot{background:var(--paper);border-top:1px solid var(--ink);}
-.foot .wrap{padding-top:64px;padding-bottom:48px;}
-.foot-logo{height:88px;width:auto;display:block;margin-bottom:16px;}
-.foot-nav{display:flex;flex-direction:column;gap:8px;}
-.foot-nav a,.foot-contact .lnk{font-family:var(--mono);font-size:12px;line-height:16px;
-  letter-spacing:.06em;text-decoration:none;color:var(--ink-soft);}
-.foot-nav a:hover{color:var(--ink);}
-.foot-contact{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
-.foot-contact .lnk{color:var(--ink);}
-
-/* ------------------------------------------- 19. RÉVÉLATION AU DÉFILEMENT */
-.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease;}
-.reveal.is-in{opacity:1;transform:none;}
-
-/* =============================================================================
-   19 bis. MOUVEMENT — un seul vocabulaire : l'encre se dépose, puis se cale.
-   Rien ne bouge pour décorer : chaque geste rejoue quelque chose de l'atelier.
-   ============================================================================= */
-
-
-/* --- États de départ : posés uniquement si le script tourne --------------- */
-/* Sans JavaScript, aucune de ces règles ne s'applique et la page reste
-   entièrement lisible — rien n'attend une animation pour apparaître. */
-.js .lines > span > i{transform:translateY(115%);}
-.js .ink-disc{opacity:0;}
-.js .hero-top .kicker::before{transform:scaleX(0);}
-.js .step .numeral{transform:translateY(110%);}
-
-/* --- Titres : la ligne monte hors du massicot ---------------------------- */
-/* Le masque déborde en haut et en bas (accents, jambages) ; la marge négative
-   annule ce débord pour que la boîte du titre reste exactement sur la grille. */
-/* Le masque doit déborder de la ligne, sinon il rogne les accents et les
-   jambages (le « q » de fabriquée, le « j » d'Abidjan). On le fait avec un
-   clip-path à valeurs négatives plutôt qu'avec overflow + marges négatives :
-   la boîte de la ligne garde exactement sa hauteur d'interligne, donc le
-   titre reste posé sur la grille au pixel près. */
-/* Débord haut : les accents des capitales. Débord bas : les jambages, qui ne
-   descendent que d'environ un pixel sous la boîte quand l'interligne égale le
-   corps — 8 px suffisent, et la ligne au repos (translatée de 115 %) reste
-   entièrement hors du masque. */
-.lines > span{display:block;clip-path:inset(-16px 0 -8px 0);}
-.lines > span > i{display:block;font-style:normal;
-  transition:transform .9s cubic-bezier(.16,1,.3,1);
-  transition-delay:calc(var(--n,0) * 90ms);}
-.lines.is-in > span > i{transform:none;}
-
-/* --- Encrage du bandeau d'accueil : C, puis M, puis Y -------------------- */
-/* L'ordre est celui du passage sous presse. On n'anime que l'opacité :
-   un transform sur le disque isolerait sa surimpression du groupe. */
-.ink-disc{transition:opacity .7s ease;
-  transition-delay:calc(600ms + var(--n,0) * 160ms);}
-.inkstack.is-in .ink-disc{opacity:1;}
-
-/* --- Filet supérieur du bandeau : la règle se tire ----------------------- */
-.hero-top .kicker{border-top:none;position:relative;}
-.hero-top .kicker::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;
-  background:var(--ink);transform-origin:0 50%;
-  transition:transform .8s cubic-bezier(.16,1,.3,1);}
-.spread-hero.is-in .hero-top .kicker::before{transform:none;}
-.spread-hero.is-in .hero-top .kicker:nth-of-type(2)::before{transition-delay:.12s;}
-
-/* --- Métiers : l'encre couvre le filet ---------------------------------- */
-.trade-ink{transition:width .55s cubic-bezier(.16,1,.3,1);}
-.trade:hover .trade-ink,.trade:focus-within .trade-ink{width:100%;}
-.trade h3{transition:transform .35s cubic-bezier(.16,1,.3,1);}
-.trade:hover h3{transform:translateX(6px);}
-/* les mots-clés s'encrent l'un après l'autre, dans le sens de la lecture */
-.tags li{transition:background-color .2s ease,color .2s ease;}
-.trade:hover .tags li{background:var(--ink);color:var(--paper);}
-.trade:hover .tags li:nth-child(2){transition-delay:.05s;}
-.trade:hover .tags li:nth-child(3){transition-delay:.10s;}
-.trade:hover .tags li:nth-child(4){transition-delay:.15s;}
-.spread-tint .trade:hover .tags li{background:var(--ink);}
-
-/* --- Catalogue : le filet s'encre, la référence avance ------------------- */
-.item{position:relative;}
-.item::before{content:"";position:absolute;top:-1px;left:0;width:0;height:1px;
-  background:var(--magenta);transition:width .45s cubic-bezier(.16,1,.3,1);}
-.item:hover::before,.item:focus-within::before{width:100%;}
-.item-ref,.item h3{transition:transform .35s cubic-bezier(.16,1,.3,1),color .25s ease;}
-.item:hover .item-ref{transform:translateX(6px);}
-.item:hover h3{transform:translateX(6px);}
-.plate svg{transition:transform .5s cubic-bezier(.16,1,.3,1);}
-.item:hover .plate svg{transform:scale(1.04);}
-
-/* --- Chantiers : défaut de repérage, puis recalage ----------------------- */
-/* Le hors-repérage est LE défaut d'imprimerie : au survol, les encres se
-   décalent d'un cheveu comme une feuille mal calée. */
-.wshape{transition:transform .5s cubic-bezier(.16,1,.3,1);}
-.work:hover .s1{transform:translate(-3px,-2px);}
-.work:hover .s2{transform:translate(3px,2px);}
-.work:hover .s3{transform:translate(-2px,3px);}
-.work:hover .s4{transform:translate(2px,-3px);}
-.work h3{transition:transform .35s cubic-bezier(.16,1,.3,1);}
-.work:hover h3{transform:translateX(6px);}
-
-/* --- Matières : la ligne se teinte, la référence s'encre ----------------- */
-.mat tbody tr{transition:background-color .25s ease;}
-.mat tbody tr td,.mat tbody tr th{transition:color .25s ease;}
-.mat tbody tr:hover .col-ref{color:var(--magenta-ink);}
-.mat tbody tr:hover th{color:var(--ink);}
-
-/* --- Procédé : le chiffre monte à la révélation -------------------------- */
-.step-no{overflow:hidden;padding-bottom:8px;margin-bottom:8px;}
-.numeral{transition:transform .8s cubic-bezier(.16,1,.3,1) .1s;}
-.step.is-in .numeral{transform:none;}
-
-/* --- Boutons : l'encre monte par le bas --------------------------------- */
-.btn-ink,.btn-line,.btn-wa{
-  background-image:linear-gradient(var(--btn-ink-fill,var(--magenta)),var(--btn-ink-fill,var(--magenta)));
-  background-repeat:no-repeat;background-position:0 100%;background-size:100% 0;
-  transition:background-size .35s cubic-bezier(.16,1,.3,1),color .25s ease;}
-.btn-ink:hover,.btn-line:hover,.btn-wa:hover{background-size:100% 100%;}
-.btn-line:hover{color:var(--paper);}
-.btn-wa{--btn-ink-fill:var(--wa-green);}
-
-/* --- Marque : les trois encres perdent le repérage, puis se recalent ----- */
-/* pas d'ombre ni de couleur au survol : seule la densité d'encre varie */
-.mark-img{transition:opacity .3s ease;}
-.mark:hover .mark-img{opacity:.74;}
-
-/* --- Navigation : le filet d'encre se tire sous le lien ----------------- */
-.nav a{position:relative;border-bottom-color:transparent;}
-.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;
-  background:var(--magenta);transform:scaleX(0);transform-origin:0 50%;
-  transition:transform .3s cubic-bezier(.16,1,.3,1);}
-.nav a:hover::after{transform:none;}
-.nav a.is-here::after{transform:none;}
-
-/* --- Repères de calage : rotation lente au survol du bloc --------------- */
-.note:hover .reg,.kicker:hover .reg{transform:rotate(90deg);}
-.reg{transition:transform .6s cubic-bezier(.16,1,.3,1);}
-
-/* --- Chiffres du bandeau d'accueil -------------------------------------- */
-.facts li{transition:transform .3s cubic-bezier(.16,1,.3,1);}
-.facts li:hover{transform:translateX(6px);}
-.facts b{transition:color .25s ease;}
-.facts li:hover b{color:var(--magenta-ink);}
-
-/* --- Coordonnées et liens ----------------------------------------------- */
-.bigtel{transition:color .25s ease,transform .35s cubic-bezier(.16,1,.3,1);}
-.bigtel:hover{transform:translateX(6px);}
-.foot-nav a{transition:color .2s ease,transform .3s cubic-bezier(.16,1,.3,1);}
-.foot-nav a:hover{transform:translateX(4px);}
-.filter{transition:background-color .2s ease,color .2s ease,box-shadow .2s ease,transform .2s ease;}
-.filter:hover{transform:translateY(-2px);}
-
-/* ----------------------------------------------------- 20. RESPONSIVE */
-@media (max-width:1279px){
-  :root{--margin:48px;--maxw:1080px;}
-  .masthead{font-size:96px;line-height:96px;}
+/* ---------- 17. WHATSAPP FLOTTANT ---------- */
+.wa-float{
+  position:fixed;right:16px;bottom:16px;z-index:90;
+  width:54px;height:54px;border-radius:50%;background:#1FA855;color:#fff;
+  display:grid;place-items:center;text-decoration:none;
+  transition:background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
 }
-@media (min-width:1280px){
-  .masthead{font-size:120px;line-height:120px;}
-  h2{font-size:56px;line-height:56px;}
-  .lede{font-size:18px;line-height:32px;}
-  .inkstack-in{height:240px;}
-  .ink-disc{width:144px;height:144px;}
-  .d-m{left:56px;top:72px;}
-  .d-y{left:112px;top:8px;}
-}
-@media (min-width:961px) and (max-width:1279px){
-  h2{font-size:48px;line-height:48px;}
-  .masthead{font-size:88px;line-height:88px;}
-}
+.wa-float:hover{background:#17904A;transform:scale(1.06)}
+.wa-float .wa{width:26px;height:26px}
 
-@media (max-width:960px){
-  :root{--margin:40px;--pad:72px;}
-  .masthead{font-size:64px;line-height:64px;}
-  h2{font-size:40px;line-height:40px;}
-  .nav{display:none;}
-  .burger{display:flex;}
-  .topbar-cta{display:none;}
-  .topbar.is-open .nav{
-    display:flex;flex-direction:column;gap:0;position:absolute;top:72px;left:0;right:0;
-    background:var(--paper);border-bottom:1px solid var(--ink);padding:8px var(--margin) 24px;
-  }
-  .topbar.is-open .nav a{padding:12px 0;font-size:14px;border-bottom:1px solid var(--ink-line);}
-  .item{grid-column:span 6;}
-  .field-row{grid-template-columns:1fr;}
-}
+/* ---------- 18. POSE DES PANNEAUX (mouvement) ---------- */
+/* on pose un panneau : il arrive du joint et se cale. Rien d'autre ne bouge. */
+html.js .tile{opacity:0;transform:translateY(14px)}
+html.js .tile.in{opacity:1;transform:none;transition:opacity 460ms var(--ease),transform 460ms var(--ease),background var(--t-mid) var(--ease)}
+html.js .lay-hero .tile{transition-delay:calc(var(--i,0) * 70ms)}
 
-@media (max-width:720px){
-  :root{--margin:24px;--pad:56px;--gutter:16px;}
-  /* en dessous de cette largeur la grille 12 colonnes n'est plus lisible :
-     chaque enfant de bande reprend la pleine largeur (les placements sont en style inline) */
-  .band > *{grid-column:1 / -1 !important;}
-  .catalogue .item{grid-column:span 6 !important;}
-  .masthead{font-size:48px;line-height:48px;}
-  h2{font-size:32px;line-height:32px;}
-  .shead{padding-bottom:32px;}
-  .kicker-r{justify-content:flex-start;}
-  .micro-r{text-align:left;}
-  .inkstack{margin-bottom:24px;}
-  .inkstack-in{height:160px;}
-  .ink-disc{width:104px;height:104px;}
-  .d-m{left:40px;top:48px;}
-  .d-y{left:80px;top:8px;}
-  .hero-cta .btn{width:auto;}
-  .hero-cta{flex-direction:row;flex-wrap:wrap;}
-  .note-cta{justify-content:flex-start;}
-  .toggle{display:none;}
-  .wa-float{width:48px;height:48px;right:16px;bottom:16px;}
-  .foot-nav{flex-direction:row;flex-wrap:wrap;gap:8px 24px;}
-}
-
-@media (max-width:479px){
-  .catalogue .item{grid-column:1 / -1 !important;}
-  .masthead{font-size:40px;line-height:40px;}
-  .facts b{flex-basis:44px;}
-}
-
-/* ------------------------------------------- 21. MOUVEMENT RÉDUIT */
 @media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto;}
-  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;}
-  .reveal{opacity:1;transform:none;}
-  /* les états de départ des animations sont annulés, sinon le contenu
-     resterait masqué chez qui a désactivé les animations */
-  .js .lines > span > i,.js .step .numeral{transform:none !important;}
-  .js .ink-disc{opacity:1 !important;}
-  .js .hero-top .kicker::before{transform:none !important;}
-  .lines > span{clip-path:none;}
+  html{scroll-behavior:auto}
+  html.js .tile{opacity:1;transform:none}
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
 
-/* ---------------------------------------------------- 22. IMPRESSION */
-@media print{
-  .topbar,.toggle,.wa-float,.densitobar,.guides,.filters,.hero-cta,.ccta{display:none !important;}
-  body{font-size:11pt;}
-  .spread-dark{background:#fff;color:#000;}
-  .spread-dark h2,.spread-dark h3{color:#000;}
-  .step p{color:#333;}
-  .wrap{padding:24pt 0;}
-  .item{break-inside:avoid;}
+/* ---------- 19. REPRISE AUX PETITES LARGEURS ---------- */
+/* comme sur une façade étroite : on repasse à un panneau par travée */
+@media (max-width:1180px){
+  .lay{grid-template-columns:repeat(6,1fr)}
+  .tile{grid-column:1/7}
+  .t-title,.t-sign,.t-head,.t-pole,.t-form,.t-aside,.t-work,.cat-grid,.t-foot-end,.empty{grid-column:1/7}
+  .t-pole,.t-step,.t-mat,.t-work{grid-column:span 3}
+  .t-title{grid-row:auto}
 }
+@media (max-width:900px){
+  .nav{
+    position:absolute;top:calc(100% + var(--joint-w));left:0;right:0;
+    flex-direction:column;gap:2px;background:var(--panel);border-radius:var(--radius);
+    padding:10px;display:none;
+  }
+  .bar-in{position:relative}
+  .nav.open{display:flex}
+  .nav a{padding:12px 14px;font-size:16px}
+  .burger{display:grid;margin-left:auto;order:3}
+  .bar-cta{order:2;margin-left:auto;padding:11px 16px}
+  .logo{order:1}
+}
+@media (max-width:720px){
+  :root{--joint-w:8px}
+  .lay{grid-template-columns:1fr}
+  /* tout ce qui portait des travées doit repasser sur la travée unique,
+     sinon la grille se crée des colonnes implicites et la page déborde */
+  .tile,.cat-grid,.empty{grid-column:1/-1;grid-row:auto}
+  .t-pole,.t-step,.t-mat,.t-work{grid-column:1/-1}
+  .cat-grid{grid-template-columns:1fr 1fr}
+  .field-row{grid-template-columns:1fr}
+  .t-foot-end{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:520px){
+  .cat-grid{grid-template-columns:1fr}
+  h1{font-size:clamp(32px,10vw,44px)}
+}
+
+/* ---------- hidden : le filtre doit primer sur le display des blocs ---------- */
+[hidden]{display:none !important}

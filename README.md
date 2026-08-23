@@ -1,84 +1,76 @@
 # CMY Imprimerie Design — site vitrine
 
-Site statique en HTML / CSS / JavaScript, sans dépendance ni build. Pour le voir :
-ouvrez `index.html` dans un navigateur, ou servez le dossier :
+Site statique en HTML / CSS / JavaScript, **sans dépendance ni build**. Direction retenue par le
+client : **Calepinage**. Pour le voir :
 
 ```bash
-cd docs && python3 -m http.server 8777   # puis http://localhost:8777
+python3 -m http.server 8777   # puis http://localhost:8777
+```
+
+En ligne : <https://elishama13.github.io/cmy-propositions/> (GitHub Pages, branche `main`, racine).
+
+Les quatre autres propositions présentées au client ne sont plus dans la branche. Elles restent
+consultables dans l'historique :
+
+```bash
+git checkout propositions-v1     # les cinq versions côte à côte
+git checkout main                # revenir au site
 ```
 
 ## Fichiers
 
 ```
-docs/
-├── index.html              toute la page (une seule page, ancres de section)
-├── assets/css/style.css    styles — la grille et la palette sont en haut du fichier
-├── assets/js/main.js       comportements — aucune dépendance
-└── assets/img/            le logo de l'entreprise, ses recadrages et l'icône d'onglet
+index.html              toute la page (une seule page, ancres de section)
+assets/css/style.css    styles — la palette et les jetons sont en haut du fichier
+assets/js/main.js       comportements — aucune dépendance
+assets/img/             le logo de l'entreprise, ses recadrages et l'icône d'onglet
 ```
 
 ## Le parti pris
 
-Le nom de l'entreprise est une palette : **CMY = Cyan, Magenta, Yellow**, les trois encres de
-la quadrichromie. Toute l'identité en découle — les aplats, la surimpression du bandeau
-d'accueil (`mix-blend-mode: multiply`, exactement ce qui se passe sur une presse : cyan + magenta
-donne du bleu, magenta + jaune du rouge, les trois du noir), les repères de calage employés comme
-puces, la barre de contrôle densitométrique en pied de page et en jauge de lecture.
+Un bardage de façade en alucobond est un **calepinage** : des panneaux de tailles différentes,
+séparés par un joint creux de 10 mm qui laisse voir l'ossature sombre. La page est construite
+ainsi — le fond sombre *est* le joint, chaque bloc *est* un panneau, la gouttière de la grille
+*est* le joint creux (`--joint-w: 10px`).
 
-La mise en page suit un **système de grille Müller-Brockmann** : 12 colonnes, ligne de base de
-8 px, interligne de 24 px. Toutes les valeurs vivent dans `:root` et servent à la fois au contenu
-et au calque de vérification.
+- **Palette** : composite gris, aluminium brossé, et une seule couleur vive — le jaune d'une LED
+  blanc chaud (`--lumen`).
+- **Typographie** : Bricolage Grotesque (titres) · Instrument Sans (texte), chargées depuis Google
+  Fonts, avec repli sur les grotesques du système.
+- **Signature** : l'enseigne « CMY » du bandeau s'allume lettre après lettre, dans l'ordre du
+  câblage.
+- **Rayon d'angle volontairement faible (3 px)** : c'est de la tôle pliée, pas du plastique.
 
-**Appuyez sur `G`** (ou cliquez « Voir la grille » en bas à gauche) pour afficher la grille sur
-laquelle la page est construite. Adhérence mesurée à 0 px à 1440, 1180 et 900 px de large.
+## Règles de fabrication
 
-Règles de fabrication tenues partout : aucune ombre portée, aucune bordure de couleur, aucune
-carte encadrée — uniquement des aplats et des filets d'un pixel.
+- **Aucune ombre portée.** Les blocs se distinguent par la valeur de leur fond ; les filets sont
+  neutres et d'un pixel.
+- **Aucun encadré de couleur.** Pas de carte à bordure teintée : uniquement des aplats.
+- **Des formes tirées de l'objet fabriqué** : faisceau d'un caisson, rouleau de vinyle, empilement
+  de panneaux, entretoise, module LED.
+- Contenu complet **sans JavaScript** — le script n'ajoute que des comportements.
+- `prefers-reduced-motion` respecté : états de départ neutralisés, animations coupées.
+- Navigation au clavier, focus visible, lien d'évitement, `aria-*` sur les contrôles.
+- Zéro débordement horizontal, vérifié à 390, 768 et 1280 px.
 
-## Le mouvement
-
-Toutes les animations parlent la même langue — **l'encre qui se dépose, puis le repérage** —
-et sont regroupées dans la section `19 bis` de `style.css`.
-
-| Ce qui bouge | Ce que ça rejoue |
-| --- | --- |
-| Ouverture du bandeau | La règle se tire, les lignes du titre montent hors du massicot, puis les trois encres se déposent **dans l'ordre du passage sous presse : cyan, magenta, jaune** |
-| Titres de section | Même montée, déclenchée quand la section entre dans le champ |
-| Survol d'un métier | L'encre de couleur couvre tout le filet, les mots-clés s'encrent l'un après l'autre |
-| Survol d'une référence | Le filet supérieur passe à l'encre magenta, la référence avance |
-| Survol d'un chantier | **Défaut de repérage** : les aplats se décalent d'un cheveu, comme une feuille mal calée, puis se recalent |
-| Survol de la marque | Les trois disques perdent le repérage, puis reviennent |
-| Boutons | L'aplat d'encre monte par le bas |
-
-Trois garde-fous tenus :
-
-1. **La grille ne bouge pas.** Les lignes de titre sont masquées par un `clip-path` à valeurs
-   négatives, pas par `overflow` + marges négatives : la boîte du titre garde exactement sa
-   hauteur d'interligne. Adhérence toujours mesurée à 0 px.
-2. **Sans JavaScript, rien n'est caché.** Les états de départ ne s'appliquent que sous
-   `html.js`, classe posée par le script lui-même.
-3. **`prefers-reduced-motion` est respecté** : les états de départ sont neutralisés, aucun
-   contenu ne reste masqué en attente d'une animation qui ne viendra pas.
-
-Pour calmer l'ensemble, réduisez les durées dans la section `19 bis`. Pour le supprimer
-entièrement, retirez cette section : la page reste complète et alignée.
-
-## Modifier le contenu courant
+## Modifier le contenu
 
 | À changer | Où |
 | --- | --- |
-| Téléphone / WhatsApp | `index.html` (chercher `2250789736267`) **et** `WA_NUMBER` en haut de `main.js` |
-| Adresse | `index.html`, section `#contact`, balise `<address>`, et le bloc JSON-LD dans `<head>` |
-| Horaires | tableau `#hoursTable` dans `index.html` **et** l'objet `HORAIRES` dans `main.js` (les deux doivent rester d'accord — c'est lui qui calcule « ouvert / fermé ») |
+| Téléphone / WhatsApp | `index.html` (chercher `2250789736267`) **et** `TEL` en haut de `main.js` |
+| Adresse | `index.html`, section `#contact`, et le bloc JSON-LD dans `<head>` |
+| Horaires | table `#hoursTable` dans `index.html` **et** l'objet `HOURS` dans `main.js` (les deux doivent rester d'accord — c'est lui qui calcule « ouvert / fermé ») |
 | Lien Facebook | `index.html`, chercher `facebook.com` |
-| Couleurs, marges, colonnes | bloc `:root` en haut de `style.css` |
+| Couleurs, joint, rayons, polices | bloc `:root` en haut de `style.css` |
+| Image de partage (Facebook, WhatsApp) | `assets/img/og-image.jpg` — les balises `og:image` pointent vers l'URL GitHub Pages, à changer si le domaine change |
 
 ## Ajouter une référence au catalogue
 
-Copiez un bloc `<article class="item" data-cat="…">` dans `#catalogue-liste`. Les catégories
+Copiez un bloc `<article class="t-item" data-cat="…">` dans le catalogue. Les catégories
 disponibles sont `enseignes`, `totems`, `facade`, `impression`, `signaletique`. Pensez à :
 
-1. mettre à jour le compteur du filtre correspondant (`<span class="filter-n">`) et celui de « Tout » ;
+1. mettre à jour le compteur du filtre correspondant (`<button class="filter"><span>`) **et** celui
+   de « Tout » — ils sont écrits en dur, le script ne les recalcule pas ;
 2. ajouter la référence dans le `<select>` du formulaire de devis, sous le bon `<optgroup>`.
 
 ## Le formulaire de devis
@@ -89,31 +81,26 @@ personnelles conservées, et le canal que la clientèle utilise déjà. Aucune c
 
 ## À remplacer par de vraies photos
 
-Les visuels du catalogue et de la section « Chantiers » sont des **schémas géométriques**, pas des
-photos : ils décrivent le type de pièce sans faire passer une image d'emprunt pour une réalisation
-de l'atelier. Dès que les photos de chantier sont disponibles, remplacez :
+Les visuels du catalogue et de la section « Chantiers » sont des **schémas SVG**, pas des photos :
+ils décrivent le type de pièce sans faire passer une image d'emprunt pour une réalisation de
+l'atelier. Dès que les photos de chantier sont disponibles, remplacez le contenu des blocs de
+visuel par un `<img>`.
 
-- dans `#catalogue-liste`, le contenu de chaque `<div class="plate">` par un `<img>` ;
-- dans `#chantiers`, chaque `<div class="work-plate">` par un `<img>`.
+## Avant la mise en ligne publique
 
-Gardez des hauteurs multiples de 24 px (168, 264, 336…) pour que le haut **et** le bas de l'image
-retombent sur la grille.
+Le site est en **`noindex`** : `robots.txt` porte `Disallow: /` et le `<head>` une balise
+`robots noindex, nofollow`. C'est délibéré tant que le contenu n'a pas été relu par l'atelier.
+Retirez les deux ensemble le jour de l'ouverture au public.
 
-## Mise en ligne
+Coordonnées, horaires, activités et matières premières proviennent de la fiche publique de
+l'entreprise sur AnnuaireCI. **À faire confirmer par l'entreprise** — ces éléments sont plausibles
+pour le métier mais ne figurent pas sur la fiche source :
 
-Le dossier s'appelle `docs/`, ce qui permet de le publier tel quel avec GitHub Pages
-(*Settings → Pages → Source : branche `main`, dossier `/docs`*). Il fonctionne aussi sur n'importe
-quel hébergement statique — Netlify, Vercel, ou un simple FTP.
+- les références du catalogue (`ENS-01`, `TOT-02`…), qui sont une nomenclature proposée ;
+- les spécifications techniques (épaisseurs, grammages, IP, formats de panneaux) ;
+- le délai « maquette à J+1 » et le déroulé des étapes ;
+- l'absence d'adresse e-mail : aucune n'est publiée, tous les contacts passent par téléphone ou
+  WhatsApp.
 
-Deux polices sont chargées depuis Google Fonts (Archivo, Space Mono). Sans connexion, la page
-retombe proprement sur les grotesques du système.
-
-## Origine des informations
-
-Coordonnées, horaires, activités et liste des matières premières proviennent de la fiche publique
-de l'entreprise sur AnnuaireCI. Les descriptions de prestations, les formats et les épaisseurs
-sont des formulations de métier courantes : **faites-les relire par l'atelier** avant la mise en
-ligne, en particulier les épaisseurs, les grammages et les tensions d'alimentation, qui varient
-selon l'arrivage.
-
-Aucune date de création, aucun chiffre d'affaires, aucun nom de client n'a été inventé.
+Aucune date de création, aucun chiffre d'affaires, aucun nom de client, aucune photo de réalisation
+n'a été inventé.
