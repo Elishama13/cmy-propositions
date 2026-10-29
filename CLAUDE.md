@@ -34,8 +34,9 @@ jour ensemble** si un vrai nom de domaine est branché.
 ## Faux texte : la règle la plus importante de ce dépôt
 
 Le client a transmis un plan de site (`request/`, non versionné — GitHub Pages servirait ces
-documents internes) qui a fait passer le site de 8 à 19 sections. Beaucoup n'ont **aucun contenu
-fourni**. La convention retenue, à tenir absolument :
+documents internes), puis un document de corrections (`docs/SITE ORGANISATION.pdf`, non versionné
+lui non plus) qui a fait passer la page unique à un site multipage. Beaucoup de panneaux n'ont
+**aucun contenu fourni**. La convention retenue, à tenir absolument :
 
 - **Texte descriptif manquant → lorem ipsum.** Visiblement faux, donc inoffensif.
 - **Donnée factuelle manquante → emplacement « à fournir », jamais une valeur inventée.**
@@ -43,24 +44,46 @@ fourni**. La convention retenue, à tenir absolument :
   création. Un faux numéro ne se repère pas comme du lorem ipsum et sonnerait chez un tiers.
 - **Ne jamais « compléter » le lorem ipsum** par du texte plausible sur l'entreprise. Le remplacer
   uniquement par ce que le client a réellement écrit.
-- Le `noindex` (`robots.txt` + balise du `<head>`) reste en place tant qu'il subsiste du faux
-  texte. `grep -c 'Lorem ipsum' index.html` donne l'état d'avancement.
+- Le `noindex` (`robots.txt` + balise du `<head>` de **chaque** page) reste en place tant qu'il
+  subsiste du faux texte. `grep -rlc 'Lorem ipsum' --include='*.html' .` donne l'état d'avancement.
 
-Repères utiles : `class="ph"` marque un emplacement photo, `data-todo="specs"` les matières dont
-les caractéristiques manquent, `.prix-v` la valeur de prix à remplir.
+Repères utiles : `class="ph"` marque un emplacement photo, `data-todo="specs"` les articles dont
+les caractéristiques manquent, `.prix-v` la valeur de prix à remplir, `class="vide"` une cellule
+« à fournir » dans le tableau de spécifications d'une fiche.
+
+La page Présentation est le **texte du client** (page 3 du PDF), repris tel quel. Les descriptifs
+de l'Imprimerie en sont extraits. Ne pas les réécrire.
 
 ## Structure
 
+Une page par entrée du menu, plus le devis et une fiche par article. Pas de gabarit partagé (pas
+de build) : l'en-tête, la barre de navigation et le pied sont **recopiés dans chaque fichier**.
+Toute modification de la barre ou du pied se fait dans les 27 fichiers — `grep -l` avant, `grep -c`
+après.
+
 ```
-index.html              page unique, 19 sections ancrées : #haut #presentation #poles
-                        #catalogue #imprimerie #decoupe #depot #decoration #import-export
-                        #logistique #atelier #realisations #formation #organigramme
-                        #perspective #detente #devis #localisation #contact
+index.html              accueil : photo de l'imprimerie + devise, devanture, puis quatre
+                        panneaux Écoute / Conseils / Accompagnement / Contacts
+presentation.html       texte du client : domaines d'expertise, mission, pourquoi CMY
+produits.html           « Produits et prix » : matières premières, puis machines EN DERNIER
+produits/<slug>.html    18 fiches détaillées MP-01 → MP-18 (chemins en ../)
+imprimerie.html         le parc machines (photos à fournir)
+realisations.html       chantiers, schémas en attendant les photos
+logistique.html         véhicules, groupes électrogènes, photo d'ensemble du personnel
+formations.html         formations et détente
+contact.html            contact ET localisation (fusionnés à la demande du client)
+devis.html              le formulaire WhatsApp ; accepte ?article=MP-03 pour présélectionner
 assets/css/style.css    jetons dans :root en haut du fichier
-assets/js/main.js       IIFE, huit blocs numérotés en commentaire
-assets/img/             logo, recadrage compact, favicons, image de partage
+assets/js/main.js       IIFE, sept blocs numérotés en commentaire
+assets/img/             logo, favicons, image de partage, atelier.jpg et devanture.jpg
 robots.txt              Disallow: / — voir « Indexation » plus bas
 ```
+
+Retirés à la demande du client (récupérables dans l'historique git, commit `6e4e11a`) : le dépôt
+en tant que section (ses 18 références sont devenues les Produits), le catalogue « Ce que nous
+fabriquons », les pôles, l'organigramme, le bloc historique/effectif/Madone de l'accueil.
+Sans entrée dans le nouveau menu, donc non reconduits : import-export, perspectives, décoration,
+découpe (son texte est passé dans Imprimerie), les étapes d'atelier.
 
 ## Le parti pris : le calepinage
 
@@ -110,33 +133,41 @@ Ce sont des contraintes assumées, pas des oublis. Les tenir dans tout ajout :
 - Accessibilité : navigation clavier, focus visible, lien d'évitement, `aria-*` sur les contrôles.
   Zéro débordement horizontal (vérifié à 390, 768 et 1280 px).
 - Les visuels sont des **schémas SVG**, jamais des photos d'emprunt présentées comme des
-  réalisations de l'atelier. Ils seront remplacés par de vraies photos de chantier.
+  réalisations de l'atelier. Ils seront remplacés par de vraies photos de chantier. Seules
+  exceptions : `atelier.jpg` et `devanture.jpg`, **fournies par le client** pour l'accueil.
 
 ## Données à garder cohérentes
 
 | Donnée | Emplacements |
 | --- | --- |
-| Devise « Pour vous, nous avons des couleurs naturelles » | le `<h1>` de l'accueil, le pied de page, la propriété `slogan` du JSON-LD et `og:description` — **libellé officiel, à ne pas reformuler ni reponctuer** (pas de point final) |
-| Numéro WhatsApp `2250789736267` | `index.html` (liens `wa.me` et `tel:`) **et** la constante `TEL` en tête de `main.js` |
-| Horaires | la table `#hoursTable` **et** l'objet `HOURS` de `main.js` (minutes depuis minuit) — c'est lui qui calcule « ouvert / fermé » |
-| Adresse, GPS, raison sociale | le corps de `index.html` **et** le bloc `<script type="application/ld+json">` du `<head>` |
-| Catalogue | les `data-cat` des `<article class="t-item">`, les compteurs `<span>` des boutons `.filter` (**écrits en dur**, le script ne les recalcule pas, « Tout » compris) et le `<select>` du devis |
-| Dépôt | 18 références MP-01 → MP-18 ; le compteur `18` de l'accueil et le `<optgroup>` Dépôt du devis suivent |
-| Navigation | la barre du haut ne porte que 7 entrées ; **le pied de page les liste toutes les 18** — y ajouter toute section nouvelle |
+| Devise « Pour vous, nous avons des couleurs naturelles » | le `<h1>` de l'accueil, le pied de **chaque** page, la propriété `slogan` du JSON-LD et `og:description` — **libellé officiel, à ne pas reformuler ni reponctuer** (pas de point final) |
+| Numéro WhatsApp `2250789736267` | tous les `.html` (liens `wa.me` et `tel:`, y compris le message prérempli des fiches) **et** la constante `TEL` en tête de `main.js` |
+| Horaires | la table `#hoursTable` de `contact.html`, la ligne d'horaires de `devis.html` **et** l'objet `HOURS` de `main.js` (minutes depuis minuit) — c'est lui qui calcule « ouvert / fermé » |
+| Adresse, GPS, raison sociale | `contact.html` **et** le bloc `<script type="application/ld+json">` du `<head>` de `index.html` |
+| Articles | 18 références MP-01 → MP-18 : la vignette de `produits.html`, la fiche `produits/<slug>.html`, les liens précédent / suivant des fiches voisines, l'`<optgroup>` du devis, les compteurs `<span>` des familles (**écrits en dur**), **et** le tableau `ARTICLES` de `main.js` qui alimente la recherche |
+| Navigation | la barre du haut porte Accueil + les 7 entrées du menu client (Présentation, Produits, Imprimerie, Réalisations, Logistique, Formations & détente, Contact) + le bouton Devis ; le pied liste en plus Devis. La page courante porte `class="is-here" aria-current="page"`, écrit en dur. Huit entrées et la recherche ne tiennent sur une ligne qu'au-delà de ~1240 px : le burger prend le relais sous 1260 px (`style.css` §19) — revérifier ce seuil si une entrée s'ajoute |
 
-Catégories valides : `enseignes`, `totems`, `facade`, `impression`, `signaletique`.
+Familles d'articles : `matieres` et `machines` — les seules que le client ait nommées. Les vraies
+familles sont « à fournir » : les ajouter dans `FAMILLES` de `main.js` et dans `produits.html`.
 
 ⚠️ `refreshStatus()` lit `getDay()` / `getHours()`, donc **l'heure locale du visiteur** : depuis
 l'Europe, le statut « ouvert / fermé » est décalé d'une à deux heures. La Côte d'Ivoire étant à
 UTC+0 toute l'année, la correction consiste à passer aux getters UTC (`getUTCDay`, `getUTCHours`,
 `getUTCMinutes`). Non corrigé à ce jour.
 
-## Recherche et filtres : un seul état
+## La recherche d'articles
 
-`main.js` §4 tient `categorie` et `terme` dans une unique fonction `appliquer()`. Ne pas ajouter un
-second mécanisme de filtrage en parallèle : les deux commandes se déferaient l'une l'autre. La
-comparaison passe par `pliable()` (minuscules + accents retirés). Le champ de recherche est
-**créé par le script** et n'existe pas dans le HTML — sans JavaScript, ce serait une commande morte.
+Revue à la demande du client (« faciliter la visualisation et la trouvaille des articles ») :
+l'ancien champ masquait des vignettes plus bas dans la page, sans qu'on voie le résultat. Le champ
+est maintenant dans la barre de **toutes** les pages et propose les articles au fil de la frappe,
+dans un panneau déroulant (combobox ARIA : flèches, Entrée, Échap) ; chaque proposition mène à la
+fiche. Il cherche dans le tableau `ARTICLES` de `main.js` §4 — pas dans le DOM, puisque l'article
+n'est pas sur la page courante. Tous les mots saisis doivent se retrouver ; la comparaison passe
+par `pliable()` (minuscules + accents retirés). Les liens sont construits depuis `RACINE`, déduite
+de l'adresse du script, pour fonctionner aussi depuis `produits/`.
+
+Le champ est **créé par le script** et n'existe pas dans le HTML — sans JavaScript, ce serait une
+commande morte ; la page Produits liste de toute façon tout.
 
 ## Le formulaire de devis
 
@@ -147,7 +178,7 @@ POST, d'API ou de persistance sans demande explicite.
 ## Indexation
 
 Le site est en `noindex` **à deux endroits** : `robots.txt` (`Disallow: /`) et une balise
-`<meta name="robots" content="noindex, nofollow">` dans le `<head>`. C'est délibéré tant que le
+`<meta name="robots" content="noindex, nofollow">` dans le `<head>` de chaque page. C'est délibéré tant que le
 contenu n'a pas été relu par l'atelier. Les retirer **ensemble**, et seulement sur demande.
 
 ## Contenu : ce qui est sourcé et ce qui ne l'est pas

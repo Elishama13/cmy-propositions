@@ -6,3 +6,4 @@ token.txt
 # GitHub Pages sert tout le dépôt : les versionner les rendrait publiquement
 # téléchargeables. Ils restent en local.
 request/
+docs/
